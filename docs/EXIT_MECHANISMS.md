@@ -1,14 +1,16 @@
 # Exit Mechanisms — Wipey
 
-When a cleaning session is active, all inputs are blocked. The user must have at least one exit mechanism enabled to end the session. Multiple mechanisms can be active simultaneously.
+When a cleaning session is active, all inputs are blocked. The user must have
+at least one exit mechanism enabled. Multiple mechanisms can be active simultaneously.
 
-> **Power button is intentionally excluded.** It triggers a shutdown/sleep which is disruptive. All exit mechanisms listed here are non-destructive.
+> **Power button intentionally excluded.** It triggers shutdown/sleep which is
+> disruptive and destructive. All mechanisms listed here are non-destructive.
 
 ---
 
-## Available Mechanisms
+## Available mechanisms
 
-### 1. Auto Timer ⏱️
+### 1. Auto Timer
 
 The session ends automatically after a configurable duration.
 
@@ -16,15 +18,16 @@ The session ends automatically after a configurable duration.
 |---|---|
 | Duration | 60 seconds |
 | Configurable range | 15s → 300s |
-| Visual countdown | Yes (shown on screen, or hidden) |
+| Visual countdown | Yes (on screen) |
 
-**How it works**: A `Timer` runs alongside the session. When it fires, `SessionManager.endSession()` is called regardless of other mechanisms.
+**Implementation**: A `Timer` runs alongside the session. When it fires,
+`SessionManager.endSession()` is called regardless of other mechanisms.
 
 **Recommended**: Always keep this enabled as a safety net.
 
 ---
 
-### 2. Hold Key ⌨️
+### 2. Hold Key
 
 Hold a specific key for a configurable duration to unlock.
 
@@ -32,15 +35,17 @@ Hold a specific key for a configurable duration to unlock.
 |---|---|
 | Key | `Escape` |
 | Hold duration | 3 seconds |
-| Visual feedback | Progress bar fills up |
+| Visual feedback | Progress indicator fills up |
 
-**How it works**: The `CGEventTap` callback lets `Esc` keydown events through to the `ExitWatcher` (without forwarding to other apps). The watcher measures continuous hold time and triggers unlock when the threshold is met.
+**Implementation**: The `CGEventTap` callback routes `Esc` keydown events to
+the `ExitWatcher` (without forwarding to other apps). The watcher measures
+continuous hold time and triggers unlock when the threshold is met.
 
 **Edge case**: If the user releases and re-presses, the timer resets.
 
 ---
 
-### 3. Key Sequence 🔢
+### 3. Key Sequence
 
 Press a key N times rapidly to unlock.
 
@@ -50,13 +55,12 @@ Press a key N times rapidly to unlock.
 | Press count | 5 times |
 | Time window | 2 seconds |
 
-**How it works**: The exit watcher counts `Esc` keydown events within a rolling 2-second window. When the count reaches the threshold, the session ends.
-
-**Note**: Can be combined with Hold Key (same key, different gesture).
+**Implementation**: The exit watcher counts `Esc` keydown events within a
+rolling 2-second window. When the count reaches the threshold, the session ends.
 
 ---
 
-### 4. Touch ID / Password 🔒
+### 4. Touch ID / Password
 
 Authenticate with Touch ID (or password fallback) to unlock.
 
@@ -66,63 +70,64 @@ Authenticate with Touch ID (or password fallback) to unlock.
 | Fallback | macOS password |
 | Reason string | "Unlock Wipey cleaning session" |
 
-**How it works**:
 ```swift
 import LocalAuthentication
 
 let context = LAContext()
 context.evaluatePolicy(
-    .deviceOwnerAuthentication,  // Touch ID + password fallback
+    .deviceOwnerAuthentication,
     localizedReason: "Unlock Wipey cleaning session"
-) { success, error in
+) { success, _ in
     if success {
-        SessionManager.shared.endSession()
+        DispatchQueue.main.async {
+            SessionManager.shared.endSession()
+        }
     }
 }
 ```
 
-**Compatibility**: Touch ID is available on all modern Macs (Touch Bar models, Magic Keyboard with Touch ID, MacBook Pro/Air with built-in Touch ID). Falls back to password on unsupported hardware.
+**Compatibility**: Available on all modern Macs with Touch ID.
+Falls back to password on unsupported hardware.
 
-**Note**: The Touch ID prompt appears above the black screen since it runs at system level.
+**Note**: The Touch ID prompt appears above the black screen (system level).
 
 ---
 
-### 5. Menu Bar Button 🖱️
+### 5. Menu Bar Button
 
 Click the Wipey icon in the menu bar to end the session.
 
 | Option | Default |
 |---|---|
-| Enabled | Yes (always visible) |
+| Always visible | Yes |
 | Requires mouse | Yes |
 
-**How it works**: The menu bar icon remains active during a session. Clicking it calls `endSession()`. Mouse events are blocked at the `CGEventTap` level, **but the menu bar operates at a higher system level** — this needs testing to confirm reliable behavior.
+**Implementation**: The menu bar icon remains active during a session.
+Clicking it calls `endSession()`.
 
-**Fallback role**: This is the "oh no I'm stuck" escape hatch for users who forgot their configured method.
+**Role**: Emergency escape hatch — always available regardless of other settings.
 
 ---
 
 ## Configuration UI
 
-In Settings, the user sees a toggle + sub-options for each mechanism:
-
 ```
 Exit Mechanisms
-───────────────────────────────────────
-[✓] Auto timer          [60 seconds ▾]
-[✓] Hold Escape key     [3 seconds  ▾]
-[ ] Key sequence
-[✓] Touch ID
+───────────────────────────────────────────
+[✓] Auto timer          [60 seconds      ▾]
+[✓] Hold Escape key     [3 seconds       ▾]
+[ ] Key sequence        [Esc × 5         ]
+[✓] Touch ID / Password
 [✓] Menu bar button     (always recommended)
-───────────────────────────────────────
-⚠️  At least one mechanism must be enabled.
+───────────────────────────────────────────
+⚠ At least one mechanism must be enabled.
 ```
 
 ---
 
-## Recommended Default Configuration
+## Recommended default configuration
 
-| Mechanism | Default state |
+| Mechanism | Default |
 |---|---|
 | Auto timer (60s) | ✅ Enabled |
 | Hold Esc (3s) | ✅ Enabled |
@@ -130,14 +135,12 @@ Exit Mechanisms
 | Touch ID | ✅ Enabled (if available) |
 | Menu bar button | ✅ Always enabled |
 
-This gives the user multiple reliable ways out without requiring any configuration on first use.
-
 ---
 
-## Implementation Priority
+## Implementation priority
 
 1. Auto timer — simplest, implement first
-2. Hold key — main interactive method
-3. Menu bar button — important fallback
-4. Touch ID — elegant but optional
+2. Hold key — primary interactive method
+3. Menu bar button — always-available fallback
+4. Touch ID — polished but optional
 5. Key sequence — nice to have

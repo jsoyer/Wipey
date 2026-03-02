@@ -22,7 +22,7 @@
 | Text secondary | Slate 500 | `#64748B` |
 | Success / clean | Emerald | `#10B981` |
 
-The gradient for the icon uses `#3B82F6` → `#06B6D4` (blue to cyan, top-left to bottom-right).
+The icon gradient uses `#3B82F6` → `#06B6D4` (blue to cyan, top-left to bottom-right).
 
 ---
 
@@ -113,11 +113,19 @@ Small app icon (rounded square, blue-cyan gradient with cloth icon) in top left 
 
 ---
 
-## Mascot (optional)
+## Mascot
 
-**Name**: Wipe (or "little Wipey")
+**Name**: Wipey (same as the app)
 **Concept**: A rounded microfiber cloth with simple dot eyes and a curved smile.
-Can be animated (bouncing, wiping motion) for the in-session screen.
+Animated (bouncing, wiping motion) for the in-session screen.
+
+### Mascot states
+| State | Animation |
+|---|---|
+| Idle (main window) | Gentle breathing, blink every 5s |
+| Session active | Wipe motion loop (left-right) |
+| Unlock / end | Small jump + sparkle, wider smile |
+| Permission error | Head shake, confused look |
 
 ### Mascot prompt
 
@@ -130,25 +138,54 @@ Transparent background, centered, portrait orientation.
 
 ---
 
+## Sarcastic remarks — copy
+
+**Idle state**
+- "Ready to get squeaky clean."
+- "Your keyboard is judging you."
+- "Fingerprints? We don't do fingerprints here."
+
+**Active session**
+- "Wiping away the evidence..."
+- "Your keyboard needed this. Trust me."
+- "Please don't sneeze on me."
+- "Fingerprints? What fingerprints?"
+- "This is weirdly satisfying."
+- "Almost as clean as your conscience."
+
+**End of session**
+- "Much cleaner. You're welcome."
+- "Squeaky clean. Obviously."
+- "Go ahead and touch it again. I dare you."
+
+**Zen mode (calm alternatives)**
+- "Cleaning in progress..."
+- "Taking good care of your device."
+- "Almost done."
+- "All clean."
+
+---
+
 ## Menu Bar Icon
 
-- **Style**: SF Symbols or custom monochrome
-- **Suggested SF Symbol**: `sparkles` or `wand.and.sparkles` or custom cloth silhouette
+- **Style**: SF Symbols or custom monochrome template
+- **Suggested SF Symbol**: `sparkles` or `wand.and.sparkles`
 - **Size**: 18×18pt template image (NSImage, template mode)
-- Must look good in both light and dark menu bar
+- Must work in both light and dark menu bar
 
 ---
 
 ## App Store Screenshots
 
-Sizes required:
+Required sizes:
 - MacBook Pro 14": 2560×1664
 - MacBook Pro 16": 3456×2234
 - Mac (general): 1280×800 or 1440×900
 
 ### Screenshot concepts
 1. **Main screen** — "Start cleaning" button, clean UI, light mode
-2. **Active session** — black screen with timer countdown
+2. **Active session** — black screen with mascot and countdown
 3. **Settings** — exit mechanism configuration panel
-4. **Permission flow** — accessibility permission onboarding
+4. **Permission onboarding** — accessibility permission flow
 5. **Dark mode** — main screen in dark mode
+6. **Multi-display** — blackout across two monitors

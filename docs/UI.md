@@ -1,95 +1,96 @@
 # UI & UX Design — Wipey
 
-## Stratégie : récupérer les utilisateurs de CleanupBuddy
+## Strategy: win CleanupBuddy users
 
-CleanupBuddy est le référent actuel. Voilà ce qu'il fait bien, et comment Wipey fait mieux sur chaque point.
+CleanupBuddy is the current reference. Here is what it does well,
+and how Wipey improves on every point.
 
-| Fonctionnalité | CleanupBuddy | Wipey |
+| Feature | CleanupBuddy | Wipey |
 |---|---|---|
-| Lock clavier | ✅ toggle | ✅ toggle |
-| Lock trackpad/souris | ✅ toggle séparé | ✅ toggle séparé |
-| Écran noir | ❌ | ✅ toggle séparé |
-| Mascotte animée | ✅ basique | ✅ plus expressive |
-| Remarques / wit | ✅ sarcastiques | ✅ + personnalisables |
-| Sortie configurable | ❌ (Cmd+Cmd fixe) | ✅ multiple + config |
+| Keyboard lock | ✅ toggle | ✅ toggle |
+| Trackpad / mouse lock | ✅ separate toggle | ✅ separate toggle |
+| Screen blackout | ❌ | ✅ separate toggle |
+| Animated mascot | ✅ basic | ✅ more expressive |
+| Wit / remarks | ✅ sarcastic | ✅ + configurable style |
+| Configurable exit | ❌ (Cmd+Cmd fixed) | ✅ multiple + configurable |
 | Menu bar | ❌ | ✅ |
-| HUD input-only | ❌ | ✅ |
-| Multi-écrans | ❌ documenté | ✅ natif |
+| Floating HUD | ❌ | ✅ (input-only mode) |
+| Multi-display | ❌ documented | ✅ native |
 | Open source | ❌ | ✅ |
+| Free | ❌ (paid) | ✅ |
 | App Store | ❌ | 🔜 |
-| Gratuit | ❌ (payant) | ✅ |
 
 ---
 
-## Fenêtre principale — État Idle
+## Main window — Idle state
 
-Fenêtre compacte, non redimensionnable, centrée à l'écran au premier lancement.
-Taille cible : **380 × 480 pt**
+Compact, non-resizable window, centered on screen at first launch.
+Target size: **380 × 480 pt**
 
 ```
 ┌────────────────────────────────────┐
-│  ◉ Wipey                    ⚙️   │  ← titre + settings
+│  ◉ Wipey                    ⚙️   │  ← title + settings
 ├────────────────────────────────────┤
 │                                    │
 │         ╭─────────────╮           │
-│         │   mascotte  │           │  ← animation idle (légère respiration)
-│         │    Wipey    │           │
+│         │   mascot    │           │  ← idle animation (gentle breathing)
+│         │   Wipey     │           │
 │         ╰─────────────╯           │
-│      "Ready to get squeaky clean" │  ← tagline rotative / wit
+│   "Ready to get squeaky clean."   │  ← rotating sarcastic remark
 │                                    │
 ├────────────────────────────────────┤
 │  What do you want to clean?        │
 │                                    │
-│  ⌨️  Keyboard & Trackpad  [  ON ] │  ← toggle, ON par défaut
+│  ⌨️  Keyboard & Trackpad  [  ON ] │  ← toggle, ON by default
 │  🖱️  Mouse                [  ON ] │  ← toggle
-│  ⬛  Screen (blackout)    [  ON ] │  ← toggle, différenciateur clé
+│  ⬛  Screen (blackout)    [  ON ] │  ← toggle, key differentiator
 │                                    │
 ├────────────────────────────────────┤
 │  ┌──────────────────────────────┐  │
-│  │       Start Cleaning  🧽    │  │  ← bouton principal, bleu
+│  │       Start Cleaning  🧽    │  │  ← primary button, blue
 │  └──────────────────────────────┘  │
 │                                    │
-│   ⏱ 60s  •  Hold Esc  •  Touch ID │  ← exit methods actifs (discret)
+│   ⏱ 60s  •  Hold Esc  •  Touch ID │  ← active exit methods (subtle)
 └────────────────────────────────────┘
 ```
 
-**Notes UX :**
-- La fenêtre reste **au-dessus de tout** (comme CleanupBuddy) même à l'état idle
-- Les toggles sont mémorisés entre les sessions
-- Le résumé des exit methods en bas évite la surprise pour les nouveaux utilisateurs
+**UX notes:**
+- Window stays **above all other windows** (like CleanupBuddy) even when idle
+- Toggles are persisted between sessions
+- Active exit methods summary at the bottom prevents surprises for new users
 
 ---
 
-## Session Active — Mode Écran Noir (blackout ON)
+## Active session — Screen blackout mode (blackout ON)
 
-L'écran devient entièrement noir. Une **petite fenêtre HUD flottante** reste visible au centre,
-au niveau `screenSaver` (au-dessus de tout).
+Screen turns entirely black. A **small floating HUD** stays visible at center,
+at `screenSaver` window level (above everything).
 
 ```
 ╔════════════════════════════════════╗
-║                                    ║  ← fond noir total, multi-écrans
+║                                    ║  ← full black background, all displays
 ║                                    ║
 ║         ╭─────────────╮           ║
-║         │  mascotte   │           ║  ← animation "wipe" en boucle
-║         │  en action  │           ║
+║         │   mascot    │           ║  ← looping wipe animation
+║         │  in action  │           ║
 ║         ╰─────────────╯           ║
 ║                                    ║
-║   "Wiping away the evidence..."   ║  ← remarque sarcastique rotative
+║   "Wiping away the evidence..."   ║  ← rotating sarcastic remark
 ║                                    ║
 ║         ┌─────────────┐           ║
 ║         │    00:42    │           ║  ← countdown timer
 ║         └─────────────┘           ║
 ║                                    ║
-║    Hold Esc for 3s to unlock       ║  ← hint exit, discret en bas
+║    Hold Esc for 3s to unlock       ║  ← subtle exit hint
 ║                                    ║
 ╚════════════════════════════════════╝
 ```
 
 ---
 
-## Session Active — Mode Input Lock Only (blackout OFF)
+## Active session — Input lock only (blackout OFF)
 
-Pas d'écran noir. Un **HUD compact flottant** en bas à droite, toujours au-dessus.
+No black screen. A **compact floating HUD** in the bottom-right corner, always on top.
 
 ```
                     ┌──────────────────────┐
@@ -98,13 +99,13 @@ Pas d'écran noir. Un **HUD compact flottant** en bas à droite, toujours au-des
                     └──────────────────────┘
 ```
 
-Clic sur le HUD → fin de session (+ confirmation).
+Clicking the HUD → ends session (with confirmation).
 
 ---
 
-## Panneau Réglages (Settings)
+## Settings panel
 
-Accessible via l'icône ⚙️ ou `Cmd+,`.
+Accessible via the ⚙️ icon or `Cmd+,`.
 
 ```
 ┌────────────────────────────────────┐
@@ -117,9 +118,8 @@ Accessible via l'icône ⚙️ ou `Cmd+,`.
 │  [ ] Key sequence    [Esc × 5  ]  │
 │  [✓] Touch ID                     │
 │  [✓] Menu bar button              │
-│      (always available)           │
 │                                    │
-│  BEHAVIOUR                         │
+│  BEHAVIOR                          │
 │  ─────────────────────────────     │
 │  [✓] Launch at login              │
 │  [✓] Show in menu bar             │
@@ -128,84 +128,78 @@ Accessible via l'icône ⚙️ ou `Cmd+,`.
 │  WIT & REMARKS                     │
 │  ─────────────────────────────     │
 │  [✓] Show remarks during session  │
-│  Style  [Sarcastic ▾]             │
+│  Style  [Sarcastic            ▾]  │
 │         Sarcastic / Zen / Silent  │
+│                                    │
+│  PRIVACY                           │
+│  ─────────────────────────────     │
+│  [ ] Share anonymous usage data   │
+│  (TelemetryDeck — opt-in)         │
 │                                    │
 │  ABOUT                             │
 │  ─────────────────────────────     │
 │  Wipey 1.0.0  •  MIT License      │
-│  github.com/jsoyer/Wipey          │
+│  wipey.app  •  github.com/jsoyer/Wipey │
 └────────────────────────────────────┘
 ```
 
 ---
 
-## Mascotte — Comportement & Animations
+## Mascot — behavior & animations
 
-| État | Animation |
+| State | Animation |
 |---|---|
-| Idle (main window) | Légère respiration, clignement toutes les 5s |
-| Session active | Mouvement de wipe en boucle (gauche-droite) |
-| Unlock / fin | Petit saut + sparkle, sourire plus large |
-| Erreur permission | Tête qui secoue, air confus |
-
-**Remarques sarcastiques (exemples) :**
-- *"Ready to get squeaky clean"* (idle)
-- *"Wiping away the evidence..."*
-- *"Your keyboard needed this. Trust me."*
-- *"Please don't sneeze on me."*
-- *"Fingerprints? What fingerprints?"*
-- *"Much cleaner. You're welcome."* (fin de session)
-
-Mode **Zen** : messages neutres et apaisants (*"Cleaning in progress…"*)
-Mode **Silent** : aucun message
+| Idle (main window) | Gentle breathing, blink every 5s |
+| Session active | Looping wipe motion (left-right) |
+| Unlock / end | Small jump + sparkle, wider smile |
+| Permission error | Head shake, confused expression |
 
 ---
 
-## Menu Bar
+## Menu bar
 
-- Icône : chiffon microfibre monochrome (template image, s'adapte light/dark)
-- Clic → ouvre la fenêtre principale
-- Clic droit → menu contextuel :
+- Icon: monochrome microfiber cloth silhouette (template image, adapts to light/dark)
+- Click → opens main window
+- Right-click → context menu:
   ```
-  Start Cleaning (last config)
-  ─────────────────────────────
+  Start Cleaning   (uses last config)
+  ─────────────────────────────────
   Settings…
   About Wipey
-  ─────────────────────────────
+  ─────────────────────────────────
   Quit Wipey
   ```
 
 ---
 
-## Palette & Style
+## Visual style
 
-- Couleurs : voir `DESIGN.md`
-- Coins arrondis : `cornerRadius 12` sur les cartes, `10` sur les boutons
-- Animations : `withAnimation(.spring(response: 0.4, dampingFraction: 0.7))`
-- Font : SF Pro (système), pas de font custom
-- Espacement : multiples de 8pt (8, 16, 24, 32)
+- Colors: see `DESIGN.md`
+- Corner radius: `12` on cards, `10` on buttons
+- Animations: `withAnimation(.spring(response: 0.4, dampingFraction: 0.7))`
+- Font: SF Pro (system), no custom fonts
+- Spacing: multiples of 8pt (8, 16, 24, 32)
 
 ---
 
-## Flux utilisateur (premier lancement)
+## First-launch user flow
 
 ```
-Lancement
+Launch
    ↓
-Vérification permission Accessibilité
-   ↓ (si manquante)
-Écran d'onboarding → ouvre Réglages Système → retour auto quand accordée
-   ↓ (si OK)
-Fenêtre principale
+Check Accessibility permission
+   ↓ (if missing)
+Onboarding screen → opens System Settings → auto-returns when granted
+   ↓ (if OK)
+Main window
    ↓
 Start Cleaning
    ↓
-Session active (écran noir / HUD selon config)
+Active session (blackout / HUD based on config)
    ↓
-Exit mechanism déclenché
+Exit mechanism triggered
    ↓
-Animation de fin + remarque sarcastique
+End animation + sarcastic remark
    ↓
-Retour fenêtre principale
+Back to main window
 ```

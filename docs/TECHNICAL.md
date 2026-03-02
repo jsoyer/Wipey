@@ -2,80 +2,168 @@
 
 ## Overview
 
-Wipey is a lightweight macOS utility built with **Swift + SwiftUI**. It has no backend, no network calls, and a minimal dependency footprint.
+Wipey is a lightweight multi-platform utility built with **Swift + SwiftUI**.
+No backend, no network calls, minimal dependencies.
 
 ---
 
-## Core Components
+## Project structure
 
-### 1. Input Blocking — `InputLockManager`
-
-Wipey intercepts all system input events using a **`CGEventTap`** at the session level, before any application (including the OS) can process them.
-
-#### Event types blocked
-
-```swift
-let blockedEvents: [CGEventType] = [
-    .keyDown,
-    .keyUp,
-    .flagsChanged,          // modifier keys (Cmd, Shift, etc.)
-    .leftMouseDown,
-    .leftMouseUp,
-    .rightMouseDown,
-    .rightMouseUp,
-    .mouseMoved,
-    .leftMouseDragged,
-    .rightMouseDragged,
-    .scrollWheel,
-    .tabletPointer,
-    .tabletProximity,
-    .otherMouseDown,
-    .otherMouseUp,
-]
+```
+Wipey.xcodeproj
+├── WipeyCore/                  ← Swift Package (platform-agnostic)
+│   ├── SessionManager.swift
+│   ├── SessionConfig.swift
+│   ├── ExitMechanism.swift
+│   ├── Protocols/
+│   │   ├── InputBlocker.swift
+│   │   └── ScreenDimmer.swift
+│   └── ExitWatcher.swift
+│
+├── Wipey (macOS)/              ← Direct distribution target
+│   ├── App/
+│   │   ├── WipeyApp.swift
+│   │   └── AppDelegate.swift
+│   ├── Platform/
+│   │   ├── MacOSInputBlocker.swift   ← CGEventTap
+│   │   └── MacOSScreenDimmer.swift   ← NSWindow blackout
+│   ├── Views/
+│   │   ├── ContentView.swift
+│   │   ├── SessionView.swift
+│   │   ├── SettingsView.swift
+│   │   ├── HUDView.swift
+│   │   └── PermissionView.swift
+│   └── Resources/
+│       ├── Assets.xcassets
+│       ├── Localizable.xcstrings
+│       └── Wipey.entitlements
+│
+├── Wipey (AppStore)/           ← Sandboxed App Store target
+│   └── Platform/
+│       └── SandboxInputBlocker.swift ← IOKit / NSEvent fallback
+│
+├── WipeyiOS/                   ← iOS target (V1.2)
+│   └── Platform/
+│       ├── iOSInputBlocker.swift     ← UIWindow overlay
+│       └── iOSScreenDimmer.swift
+│
+└── WipeyVision/                ← visionOS target (V1.3)
+    └── Platform/
+        ├── VisionInputBlocker.swift
+        └── VisionScreenDimmer.swift
 ```
 
-#### How it works
+---
+
+## Core Protocols (WipeyCore)
 
 ```swift
+// InputBlocker.swift
+protocol InputBlocker: AnyObject {
+    func startBlocking(config: SessionConfig) throws
+    func stopBlocking()
+    var isBlocking: Bool { get }
+}
+
+// ScreenDimmer.swift
+protocol ScreenDimmer: AnyObject {
+    func dim(animated: Bool)
+    func restore(animated: Bool)
+    var isDimmed: Bool { get }
+}
+```
+
+`SessionManager` depends only on these protocols — never on platform implementations.
+
+---
+
+## SessionManager (WipeyCore)
+
+State machine coordinating all session activity.
+
+```
+idle → starting → active → ending → idle
+```
+
+```swift
+@Observable
+class SessionManager {
+    var state: SessionState = .idle
+    var elapsedSeconds: Int = 0
+
+    private let inputBlocker: InputBlocker
+    private let screenDimmer: ScreenDimmer
+    private let exitWatcher: ExitWatcher
+
+    init(inputBlocker: InputBlocker, screenDimmer: ScreenDimmer) { ... }
+
+    func startSession(config: SessionConfig) throws { ... }
+    func endSession() { ... }
+}
+```
+
+---
+
+## macOS — Input Blocking (CGEventTap)
+
+Intercepts all system input events before any application can process them.
+
+```swift
+// MacOSInputBlocker.swift
+let blockedEvents: [CGEventType] = [
+    .keyDown, .keyUp, .flagsChanged,
+    .leftMouseDown, .leftMouseUp,
+    .rightMouseDown, .rightMouseUp,
+    .mouseMoved, .leftMouseDragged, .rightMouseDragged,
+    .scrollWheel, .otherMouseDown, .otherMouseUp,
+    .tabletPointer, .tabletProximity,
+]
+
 let tap = CGEvent.tapCreate(
-    tap: .cgSessionEventTap,      // session-level: intercepts before any app
-    place: .headInsertEventTap,   // head: first in line, blocks everything
-    options: .defaultTap,         // active tap (not passive listener)
+    tap: .cgSessionEventTap,
+    place: .headInsertEventTap,
+    options: .defaultTap,
     eventsOfInterest: eventMask,
     callback: { proxy, type, event, userInfo in
-        // Return nil to consume/block the event
-        // Return event to pass it through
-        return nil
+        let blocker = Unmanaged<MacOSInputBlocker>
+            .fromOpaque(userInfo!).takeUnretainedValue()
+        // Let exit watcher inspect the event before consuming it
+        if blocker.exitWatcher.shouldUnlock(type: type, event: event) {
+            SessionManager.shared.endSession()
+        }
+        return nil  // consume / block the event
     },
-    userInfo: nil
+    userInfo: Unmanaged.passUnretained(self).toOpaque()
 )
 ```
 
-#### Accessibility permission
+**Accessibility permission required**: `CGEventTap` with `.defaultTap` needs the
+Accessibility permission. Without it, the tap is created but events pass through.
 
-`CGEventTap` with `.defaultTap` requires the **Accessibility** permission.
-Without it, the tap is created but events pass through unblocked.
-
-Check and prompt:
 ```swift
-let trusted = AXIsProcessTrusted()
-if !trusted {
-    // Open System Settings > Privacy & Security > Accessibility
-    let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
+func checkAccessibilityPermission() -> Bool {
+    AXIsProcessTrusted()
+}
+
+func requestAccessibilityPermission() {
+    let url = URL(string:
+        "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
     NSWorkspace.shared.open(url)
 }
 ```
 
-On first launch, Wipey must guide the user to grant this permission before any session can start.
+**Safety**: If Wipey crashes during a session, the `CGEventTap` is automatically
+released by the OS. The user is never permanently locked out.
 
 ---
 
-### 2. Screen Blackout — `ScreenBlackoutManager`
+## macOS — Screen Blackout (NSWindow)
 
-Creates a borderless, full-screen black `NSWindow` above all other windows on each display.
+Creates a borderless full-screen black window above all other windows on each display.
 
 ```swift
-func blackoutAllScreens() {
+// MacOSScreenDimmer.swift
+func dim(animated: Bool) {
     for screen in NSScreen.screens {
         let window = NSWindow(
             contentRect: screen.frame,
@@ -89,115 +177,118 @@ func blackoutAllScreens() {
         )
         window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         window.isOpaque = true
-        window.ignoresMouseEvents = true  // input is already blocked at tap level
-        window.makeKeyAndOrderFront(nil)
+        window.ignoresMouseEvents = true
+
+        if animated {
+            window.alphaValue = 0
+            window.makeKeyAndOrderFront(nil)
+            NSAnimationContext.runAnimationGroup { ctx in
+                ctx.duration = 0.4
+                window.animator().alphaValue = 1.0
+            }
+        } else {
+            window.makeKeyAndOrderFront(nil)
+        }
         blackoutWindows.append(window)
     }
 }
-
-func restoreScreens() {
-    blackoutWindows.forEach { $0.orderOut(nil) }
-    blackoutWindows.removeAll()
-}
 ```
-
-**Fade animation** (optional, polish):
-```swift
-NSAnimationContext.runAnimationGroup { ctx in
-    ctx.duration = 0.4
-    window.animator().alphaValue = 1.0
-}
-```
-
-**Multi-display**: `NSScreen.screens` returns all connected displays automatically.
 
 ---
 
-### 3. Exit Mechanisms — `ExitWatcher`
+## Exit Watcher (WipeyCore)
 
-See [EXIT_MECHANISMS.md](EXIT_MECHANISMS.md) for full configuration details.
+Runs in parallel with the input tap, monitors for configured exit triggers.
 
-The exit watcher runs in parallel with the input tap. It monitors for the configured exit trigger(s) and calls `SessionManager.endSession()` when triggered.
+The `CGEventTap` callback routes events through the exit watcher before consuming them.
+The watcher inspects events but never forwards them — it only signals `SessionManager`.
 
-Key constraint: the `CGEventTap` callback must **selectively pass through** the events needed by the active exit mechanisms (e.g., let `Esc` keydown through to the exit watcher without propagating it to other apps).
+See [EXIT_MECHANISMS.md](EXIT_MECHANISMS.md) for all mechanism details.
+
+---
+
+## App Store target — Sandboxed approach
+
+`CGEventTap` is blocked in the App Store Sandbox.
+The App Store target uses a fallback approach:
 
 ```swift
-callback: { proxy, type, event, userInfo in
-    let watcher = Unmanaged<ExitWatcher>.fromOpaque(userInfo!).takeUnretainedValue()
+// SandboxInputBlocker.swift
+// NSEvent.addGlobalMonitorForEvents — passive, cannot block, but can intercept
+// IOKit HID — possible with correct entitlements, to be evaluated
+// Guided Access API — system-level, requires evaluation
+```
 
-    if watcher.shouldUnlock(event: event, type: type) {
-        SessionManager.shared.endSession()
-        return nil  // still consume the event
+> This is a known limitation. The App Store version may have reduced blocking
+> reliability compared to the direct distribution version. To be documented
+> transparently in the App Store description.
+
+---
+
+## Localization
+
+Format: `Localizable.xcstrings` (Xcode 15+)
+
+```json
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "session.start.button": {
+      "comment": "Main CTA button to start a cleaning session",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Start Cleaning" } },
+        "fr": { "stringUnit": { "state": "translated", "value": "Commencer le nettoyage" } }
+      }
     }
-
-    return nil  // block everything else
+  }
 }
 ```
 
 ---
 
-### 4. Session Manager — `SessionManager`
+## Telemetry (TelemetryDeck)
 
-Central coordinator. Manages state transitions:
+```swift
+// Only called if user has opted in
+import TelemetryDeck
 
+TelemetryDeck.signal("session.started", parameters: [
+    "exitMechanisms": config.exitMechanisms.map(\.rawValue).joined(separator: ","),
+    "blackoutEnabled": String(config.blackoutEnabled),
+    "inputLockEnabled": String(config.inputLockEnabled),
+])
 ```
-idle → starting → active → ending → idle
+
+---
+
+## Sparkle (auto-update)
+
+```xml
+<!-- Wipey.entitlements — direct distribution only -->
+<key>com.apple.security.network.client</key>
+<true/>
 ```
 
 ```swift
-class SessionManager: ObservableObject {
-    @Published var state: SessionState = .idle
-    @Published var elapsedSeconds: Int = 0
+// WipeyApp.swift
+import Sparkle
 
-    func startSession(config: SessionConfig) { ... }
-    func endSession() { ... }
+@main
+struct WipeyApp: App {
+    private let updaterController = SPUStandardUpdaterController(
+        startingUpdater: true,
+        updaterDelegate: nil,
+        userDriverDelegate: nil
+    )
+    // ...
 }
 ```
 
-`SessionConfig` holds the user's exit mechanism preferences and timer duration.
-
 ---
 
-## App Architecture
-
-```
-Wipey/
-├── App/
-│   ├── WipeyApp.swift          ← @main, menu bar setup
-│   └── AppDelegate.swift
-├── Core/
-│   ├── SessionManager.swift    ← state machine
-│   ├── InputLockManager.swift  ← CGEventTap
-│   ├── ScreenBlackoutManager.swift
-│   └── ExitWatcher.swift       ← exit mechanism logic
-├── Views/
-│   ├── ContentView.swift       ← main window
-│   ├── SessionView.swift       ← active session UI
-│   ├── SettingsView.swift      ← preferences
-│   └── PermissionView.swift    ← accessibility onboarding
-├── Models/
-│   ├── SessionConfig.swift
-│   └── ExitMechanism.swift
-└── Resources/
-    ├── Assets.xcassets
-    └── Wipey.entitlements
-```
-
----
-
-## App Store Considerations
-
-The App Store **Sandbox** restricts `CGEventTap` from monitoring system-wide events. Two options:
-
-1. **Direct distribution** (recommended initially) — full `CGEventTap` access, notarized `.dmg`
-2. **App Store** — requires a different input blocking approach (possibly using `IOKit` or `NSEvent.addGlobalMonitorForEvents`) with reduced reliability
-
-The plan is to ship direct distribution first, then evaluate App Store compatibility.
-
----
-
-## Minimum Requirements
+## Minimum requirements
 
 - macOS 13.0 Ventura
 - Xcode 15+
 - Swift 5.9+
+- Apple Developer account (for signing + notarization)

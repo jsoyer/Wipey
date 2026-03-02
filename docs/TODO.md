@@ -1,19 +1,29 @@
 # TODO — Research & Tasks
 
-## À regarder
+## To watch
 
-- [ ] **Vidéo de présentation CleanupBuddy**
+- [ ] **CleanupBuddy presentation video**
   https://www.youtube.com/watch?v=WTm54XVWfRU
-  → Détails UI, mascotte, animations, flow de l'app, remarques sarcastiques
-  → Identifier ce qu'on peut faire mieux dans Wipey
+  → UI details, mascot, animations, app flow, sarcastic remarks
+  → Identify what Wipey can do better
 
-## À vérifier
+## To verify
 
-- [ ] Disponibilité du domaine `wipey.app` sur Namecheap ou Google Domains
-- [ ] Générer le logo avec les prompts de `docs/DESIGN.md`
+- [x] Domain `wipey.app` — purchased ✅
+- [ ] Generate logo using prompts from `docs/DESIGN.md`
 
-## App Store (plus tard)
+## Before first release
 
-- [ ] Créer un compte Apple Developer si pas encore fait ($99/an)
-- [ ] Tester compatibilité CGEventTap avec Sandbox App Store
-- [ ] Préparer screenshots App Store (voir `docs/DESIGN.md`)
+- [ ] Apple Developer account ($99/year) if not already active
+- [ ] Set up code signing (Developer ID Application certificate)
+- [ ] Configure Sparkle feed at `https://wipey.app/appcast.xml`
+- [ ] Set up TelemetryDeck account and get App ID
+- [ ] Set up GitHub Sponsors on the repo
+
+## App Store (later)
+
+- [ ] Test `CGEventTap` compatibility with App Store Sandbox
+- [ ] Prepare App Store screenshots (see `docs/DESIGN.md`)
+- [ ] Write App Store description and keywords
+- [ ] Prepare `PrivacyInfo.xcprivacy`
+- [ ] Submit for review

@@ -1,8 +1,10 @@
 # Wipey 🧽
 
-> The friendly macOS utility to safely clean your keyboard, trackpad, and screen.
+> The friendly utility to safely clean your Apple devices.
 
 Wipey temporarily disables all keyboard and trackpad input so you can wipe your Mac without triggering accidental keypresses or clicks. It also turns your screen pitch black — perfect for spotting fingerprints and smudges.
+
+**[wipey.app](https://wipey.app)** · macOS · iOS (coming) · visionOS (coming)
 
 ---
 
@@ -27,9 +29,14 @@ Download the latest `.dmg` from the [Releases](../../releases) page.
 
 > Wipey is notarized by Apple. macOS may show a security prompt on first launch — this is expected.
 
+### Homebrew
+```bash
+brew install --cask wipey
+```
+
 ### Build from source
 ```bash
-git clone https://github.com/YOUR_USERNAME/Wipey.git
+git clone https://github.com/jsoyer/Wipey.git
 cd Wipey
 open Wipey.xcodeproj
 ```
@@ -56,14 +63,12 @@ See [EXIT_MECHANISMS.md](docs/EXIT_MECHANISMS.md) for full details.
 
 ## Roadmap
 
-- [ ] App Store release
-- [ ] Shortcuts app integration
-- [ ] Menu bar only mode
-- [ ] Custom timer duration
+See [ROADMAP.md](docs/ROADMAP.md) for the full roadmap including iOS and visionOS plans.
 
 ## Contributing
 
-Pull requests are welcome. Please open an issue first to discuss major changes.
+Pull requests are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Translation contributions are especially appreciated — see `Localizable.xcstrings`.
 
 ## License
 
