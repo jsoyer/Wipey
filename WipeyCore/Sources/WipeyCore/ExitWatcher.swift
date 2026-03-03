@@ -99,6 +99,10 @@ public final class ExitWatcher {
     // MARK: - Trigger
 
     private func triggerUnlock() {
+        // Safe from TOCTOU: process() is always called on the main thread
+        // (MacOSInputBlocker dispatches CGEventTap events to main before invoking it),
+        // so this async dispatch merely defers the callback to the next run-loop cycle
+        // without introducing any concurrent-access window.
         DispatchQueue.main.async { [weak self] in
             self?.onUnlock?()
         }

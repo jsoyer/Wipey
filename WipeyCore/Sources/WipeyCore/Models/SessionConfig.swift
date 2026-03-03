@@ -28,9 +28,12 @@ public struct SessionConfig: Codable, Equatable {
         self.lockTrackpad = lockTrackpad
         self.blackoutScreen = blackoutScreen
         self.enabledExitMechanisms = enabledExitMechanisms
-        self.timerDuration = timerDuration
-        self.holdKeyDuration = holdKeyDuration
-        self.keySequenceCount = keySequenceCount
+        // Clamp to sensible minimums so downstream code never receives
+        // zero or negative durations — avoids silent infinite loops or
+        // immediately-expiring timers.
+        self.timerDuration = max(1, timerDuration)
+        self.holdKeyDuration = max(0.5, holdKeyDuration)
+        self.keySequenceCount = max(1, keySequenceCount)
     }
 
     /// Returns true if at least one exit mechanism is active.

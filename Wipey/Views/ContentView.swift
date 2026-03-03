@@ -16,7 +16,7 @@ struct ContentView: View {
             Divider()
             mascotSection
             Divider()
-            toggleSection(session: $session)
+            toggleSection(session: $session, isActive: session.state.isActive)
             Divider()
             ctaSection
         }
@@ -33,8 +33,9 @@ struct ContentView: View {
             isPresented: $permissionError
         ) {
             Button(String(localized: "permission.alert.open_settings", comment: "Button to open System Settings")) {
-                let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
-                NSWorkspace.shared.open(url)
+                if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+                    NSWorkspace.shared.open(url)
+                }
             }
             Button(String(localized: "common.cancel", comment: "Cancel button"), role: .cancel) {}
         } message: {
@@ -86,7 +87,7 @@ struct ContentView: View {
     // @Bindable wrapper for the same object inside a nested computed property.
 
     @ViewBuilder
-    private func toggleSection(session: Bindable<SessionManager>) -> some View {
+    private func toggleSection(session: Bindable<SessionManager>, isActive: Bool) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("section.what_to_clean", comment: "Section label asking the user what to clean")
                 .font(.subheadline)
@@ -111,6 +112,9 @@ struct ContentView: View {
             )
         }
         .padding(.vertical, 16)
+        // Disable toggles during an active session — same policy as SettingsView.
+        // Changing lock options mid-session could leave the device in an inconsistent state.
+        .disabled(isActive)
     }
 
     // MARK: - CTA

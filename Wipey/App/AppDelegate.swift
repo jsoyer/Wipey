@@ -166,15 +166,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func showSessionHUD() {
         closeSessionHUD()
 
-        let config = sessionManager.config
-        let rootView: AnyView = config.blackoutScreen
-            ? AnyView(SessionView().environment(sessionManager))
-            : AnyView(HUDView().environment(sessionManager))
-
-        let hosting = NSHostingView(rootView: rootView)
+        let hosting = NSHostingView(rootView: hudContent())
 
         let window = NSPanel(
-            contentRect: hudFrame(compact: !config.blackoutScreen),
+            contentRect: hudFrame(compact: !sessionManager.config.blackoutScreen),
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
@@ -188,6 +183,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         window.orderFrontRegardless()
 
         sessionHUDWindow = window
+    }
+
+    @ViewBuilder @MainActor
+    private func hudContent() -> some View {
+        if sessionManager.config.blackoutScreen {
+            SessionView().environment(sessionManager)
+        } else {
+            HUDView().environment(sessionManager)
+        }
     }
 
     private func closeSessionHUD() {

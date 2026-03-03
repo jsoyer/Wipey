@@ -183,19 +183,21 @@ final class SessionManagerTests: XCTestCase {
     }
 
     func testCountdownEndsSession() throws {
-        let exp = expectation(description: "Session ends after countdown")
         session.config.enabledExitMechanisms = [.autoTimer]
         session.config.timerDuration = 1
 
         try session.startSession()
         XCTAssertTrue(session.state.isActive)
 
-        // Give the 1-second timer time to fire (plus a small buffer)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            XCTAssertEqual(self.session.state, .idle, "Session must auto-end after timer expires")
-            exp.fulfill()
+        // Spin the main RunLoop until the session self-terminates or we time out.
+        // Using RunLoop directly avoids the GCD/main-queue scheduling race that
+        // DispatchQueue.main.asyncAfter can introduce when the timer fires on the
+        // same main RunLoop iteration.
+        let deadline = Date(timeIntervalSinceNow: 3)
+        while session.state.isActive && Date() < deadline {
+            RunLoop.main.run(mode: .default, before: Date(timeIntervalSinceNow: 0.1))
         }
 
-        wait(for: [exp], timeout: 3)
+        XCTAssertEqual(session.state, .idle, "Session must auto-end after timer expires")
     }
 }

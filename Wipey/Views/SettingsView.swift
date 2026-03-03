@@ -221,11 +221,15 @@ struct SettingsView: View {
                 String(localized: "settings.license", comment: "License label"),
                 value: "MIT"
             )
-            Link("wipey.app", destination: URL(string: "https://wipey.app")!)
-            Link(
-                String(localized: "settings.github", comment: "GitHub link label"),
-                destination: URL(string: "https://github.com/jsoyer/Wipey")!
-            )
+            if let wipeyURL = URL(string: "https://wipey.app") {
+                Link("wipey.app", destination: wipeyURL)
+            }
+            if let githubURL = URL(string: "https://github.com/jsoyer/Wipey") {
+                Link(
+                    String(localized: "settings.github", comment: "GitHub link label"),
+                    destination: githubURL
+                )
+            }
         }
     }
 
