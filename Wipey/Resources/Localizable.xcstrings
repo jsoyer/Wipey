@@ -1,0 +1,321 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "app.name" : {
+      "comment" : "Application name",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Wipey" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Wipey" } }
+      }
+    },
+    "auth.reason" : {
+      "comment" : "Touch ID / password prompt reason",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Unlock Wipey cleaning session" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Déverrouiller la session de nettoyage Wipey" } }
+      }
+    },
+    "common.cancel" : {
+      "comment" : "Cancel button",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cancel" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Annuler" } }
+      }
+    },
+    "exit.hint.hold_esc" : {
+      "comment" : "Short label indicating hold-Esc exit",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Hold Esc" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Maintenir Échap" } }
+      }
+    },
+    "exit.hint.touch_id" : {
+      "comment" : "Short label indicating Touch ID exit",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Touch ID" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Touch ID" } }
+      }
+    },
+    "header.settings.tooltip" : {
+      "comment" : "Settings button tooltip",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Settings" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Réglages" } }
+      }
+    },
+    "hud.exit.hint" : {
+      "comment" : "Brief instruction to exit shown in the compact HUD",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Hold Esc to unlock" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Maintenir Échap pour déverrouiller" } }
+      }
+    },
+    "menu.open_wipey" : {
+      "comment" : "Menu item to open the main window",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Open Wipey" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ouvrir Wipey" } }
+      }
+    },
+    "menu.quit" : {
+      "comment" : "Menu item to quit the app",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Quit Wipey" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Quitter Wipey" } }
+      }
+    },
+    "menu.settings" : {
+      "comment" : "Menu item to open Settings",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Settings…" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Réglages…" } }
+      }
+    },
+    "menu.start_cleaning" : {
+      "comment" : "Menu item to start a session",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Start Cleaning" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Commencer le nettoyage" } }
+      }
+    },
+    "menu.stop_cleaning" : {
+      "comment" : "Menu item to stop an active session",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Stop Cleaning" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Arrêter le nettoyage" } }
+      }
+    },
+    "permission.alert.message" : {
+      "comment" : "Alert message explaining why accessibility is needed",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Wipey needs Accessibility permission to lock your keyboard and trackpad." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Wipey a besoin d'accès à l'accessibilité pour verrouiller votre clavier et trackpad." } }
+      }
+    },
+    "permission.alert.open_settings" : {
+      "comment" : "Button to open System Settings",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Open System Settings" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ouvrir les Réglages Système" } }
+      }
+    },
+    "permission.alert.title" : {
+      "comment" : "Alert title when accessibility permission is denied during session start",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Accessibility Permission Required" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Permission d'accessibilité requise" } }
+      }
+    },
+    "permission.body" : {
+      "comment" : "Explanation of why Accessibility permission is needed",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Wipey needs Accessibility permission to lock your keyboard and trackpad while you clean your Mac.\n\nYour keystrokes are never stored or transmitted." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Wipey a besoin d'accès à l'accessibilité pour verrouiller votre clavier et trackpad pendant le nettoyage.\n\nVos frappes ne sont jamais enregistrées ni transmises." } }
+      }
+    },
+    "permission.cta" : {
+      "comment" : "Button to open System Settings for Accessibility permission",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Open System Settings" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ouvrir les Réglages Système" } }
+      }
+    },
+    "permission.instructions" : {
+      "comment" : "Step-by-step instructions after opening System Settings",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Go to Privacy & Security → Accessibility, then enable Wipey." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Allez dans Confidentialité et sécurité → Accessibilité, puis activez Wipey." } }
+      }
+    },
+    "permission.title" : {
+      "comment" : "Title of the permission onboarding screen",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Accessibility Access Required" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Accès à l'accessibilité requis" } }
+      }
+    },
+    "section.what_to_clean" : {
+      "comment" : "Section label asking the user what to clean",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "What do you want to clean?" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Que voulez-vous nettoyer ?" } }
+      }
+    },
+    "session.exit.hint.hold_key" : {
+      "comment" : "Instruction to hold Esc key to exit",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Hold Esc for 3s to unlock" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Maintenir Échap 3s pour déverrouiller" } }
+      }
+    },
+    "session.exit.hint.timer" : {
+      "comment" : "Instruction that session ends automatically",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Session ends automatically" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "La session se termine automatiquement" } }
+      }
+    },
+    "session.start.button" : {
+      "comment" : "CTA to start a cleaning session",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Start Cleaning" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Commencer le nettoyage" } }
+      }
+    },
+    "settings.always_on" : {
+      "comment" : "Label for a mechanism that cannot be disabled",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Always on" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Toujours actif" } }
+      }
+    },
+    "settings.exit_mechanisms.warning" : {
+      "comment" : "Warning when no exit mechanism is enabled",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "At least one exit mechanism must be enabled." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Au moins un mécanisme de sortie doit être activé." } }
+      }
+    },
+    "settings.github" : {
+      "comment" : "GitHub link label",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "View on GitHub" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Voir sur GitHub" } }
+      }
+    },
+    "settings.hold_key.duration" : {
+      "comment" : "Hold key duration picker label",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Duration" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Durée" } }
+      }
+    },
+    "settings.key_sequence.count" : {
+      "comment" : "Key sequence press count picker label",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Presses" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Appuis" } }
+      }
+    },
+    "settings.launch_at_login" : {
+      "comment" : "Launch at login toggle label",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Launch at Login" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Lancer au démarrage" } }
+      }
+    },
+    "settings.license" : {
+      "comment" : "License label",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "License" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Licence" } }
+      }
+    },
+    "settings.menu_bar_only" : {
+      "comment" : "Menu bar only mode toggle label",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Menu Bar Only (no window)" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Barre des menus uniquement (sans fenêtre)" } }
+      }
+    },
+    "settings.remarks_style" : {
+      "comment" : "Remarks style picker label",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Style" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Style" } }
+      }
+    },
+    "settings.section.about" : {
+      "comment" : "About section header",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "About" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "À propos" } }
+      }
+    },
+    "settings.section.behavior" : {
+      "comment" : "Behavior section header",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Behavior" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Comportement" } }
+      }
+    },
+    "settings.section.exit_mechanisms" : {
+      "comment" : "Exit mechanisms section header",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Exit Mechanisms" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Mécanismes de sortie" } }
+      }
+    },
+    "settings.section.privacy" : {
+      "comment" : "Privacy section header",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Privacy" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Confidentialité" } }
+      }
+    },
+    "settings.section.remarks" : {
+      "comment" : "Remarks section header",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Wit & Remarks" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Remarques" } }
+      }
+    },
+    "settings.show_in_menu_bar" : {
+      "comment" : "Show in menu bar toggle label",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Show in Menu Bar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Afficher dans la barre des menus" } }
+      }
+    },
+    "settings.telemetry_description" : {
+      "comment" : "Short description of what telemetry collects",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Powered by TelemetryDeck — opt-in, privacy-first. Never collects personal data." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Via TelemetryDeck — opt-in, vie privée d'abord. Aucune donnée personnelle collectée." } }
+      }
+    },
+    "settings.telemetry_opt_in" : {
+      "comment" : "Telemetry opt-in toggle label",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Share Anonymous Usage Data" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Partager les données d'utilisation anonymes" } }
+      }
+    },
+    "settings.timer.duration" : {
+      "comment" : "Timer duration picker label",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Duration" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Durée" } }
+      }
+    },
+    "settings.version" : {
+      "comment" : "Version label",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Version" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Version" } }
+      }
+    },
+    "toggle.keyboard" : {
+      "comment" : "Toggle for locking keyboard and trackpad",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Keyboard & Trackpad" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Clavier & Trackpad" } }
+      }
+    },
+    "toggle.mouse" : {
+      "comment" : "Toggle for locking mouse",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Mouse" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Souris" } }
+      }
+    },
+    "toggle.screen" : {
+      "comment" : "Toggle for screen blackout",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Screen Blackout" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Écran noir" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}
