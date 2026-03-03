@@ -5,24 +5,24 @@ public enum Remarks {
 
     public static func idle(style: PreferencesManager.RemarksStyle) -> String {
         switch style {
-        case .sarcastic: return sarcasticIdle.randomElement()!
-        case .zen:       return zenIdle.randomElement()!
+        case .sarcastic: return sarcasticIdle.randomElement() ?? ""
+        case .zen:       return zenIdle.randomElement() ?? ""
         case .silent:    return ""
         }
     }
 
     public static func active(style: PreferencesManager.RemarksStyle) -> String {
         switch style {
-        case .sarcastic: return sarcasticActive.randomElement()!
-        case .zen:       return zenActive.randomElement()!
+        case .sarcastic: return sarcasticActive.randomElement() ?? ""
+        case .zen:       return zenActive.randomElement() ?? ""
         case .silent:    return ""
         }
     }
 
     public static func done(style: PreferencesManager.RemarksStyle) -> String {
         switch style {
-        case .sarcastic: return sarcasticDone.randomElement()!
-        case .zen:       return zenDone.randomElement()!
+        case .sarcastic: return sarcasticDone.randomElement() ?? ""
+        case .zen:       return zenDone.randomElement() ?? ""
         case .silent:    return ""
         }
     }

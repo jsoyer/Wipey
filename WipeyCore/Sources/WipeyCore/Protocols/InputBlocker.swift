@@ -13,6 +13,10 @@ public protocol InputBlocker: AnyObject {
 
     /// Whether input is currently being blocked.
     var isBlocking: Bool { get }
+
+    /// The exit watcher to notify of input events during a session.
+    /// Set by `SessionManager` before calling `startBlocking`.
+    var exitWatcher: ExitWatcher? { get set }
 }
 
 public enum InputBlockerError: LocalizedError {

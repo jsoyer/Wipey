@@ -8,6 +8,7 @@ import WipeyCore
 public final class MacOSInputBlocker: InputBlocker {
 
     public private(set) var isBlocking = false
+    public var exitWatcher: ExitWatcher?
 
     private var eventTap: CFMachPort?
     private var runLoopSource: CFRunLoopSource?

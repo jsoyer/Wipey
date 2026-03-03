@@ -55,9 +55,19 @@ public final class SessionManager {
         }
 
         inputBlocker.exitWatcher = exitWatcher
-        try inputBlocker.startBlocking(config: config)
-        exitWatcher.start(config: config)
 
+        do {
+            try inputBlocker.startBlocking(config: config)
+        } catch {
+            // Rollback any side effects before re-throwing
+            if screenDimmer.isDimmed {
+                screenDimmer.restore(animated: false)
+            }
+            state = .idle
+            throw error
+        }
+
+        exitWatcher.start(config: config)
         state = .active(startedAt: Date())
         startCountdown()
     }
@@ -96,13 +106,3 @@ public final class SessionManager {
     }
 }
 
-// MARK: - InputBlocker extension to carry exitWatcher reference
-
-public extension InputBlocker {
-    var exitWatcher: ExitWatcher? {
-        get { objc_getAssociatedObject(self, &exitWatcherKey) as? ExitWatcher }
-        set { objc_setAssociatedObject(self, &exitWatcherKey, newValue, .OBJC_ASSOCIATION_ASSIGN) }
-    }
-}
-
-private var exitWatcherKey: UInt8 = 0

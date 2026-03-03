@@ -85,7 +85,7 @@ struct SettingsView: View {
                 .disabled(!config.enabledExitMechanisms.contains(.keySequence))
             }
 
-            exitMechanismRow(mechanism: .touchID, trailing: EmptyView())
+            exitMechanismRow(mechanism: .touchID) { EmptyView() }
 
             HStack {
                 Label {

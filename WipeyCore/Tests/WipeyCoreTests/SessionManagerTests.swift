@@ -8,6 +8,7 @@ final class MockInputBlocker: InputBlocker {
     private(set) var startCallCount = 0
     private(set) var stopCallCount = 0
     var shouldThrow = false
+    var exitWatcher: ExitWatcher?
 
     func startBlocking(config: SessionConfig) throws {
         if shouldThrow { throw InputBlockerError.accessibilityPermissionDenied }
@@ -98,6 +99,7 @@ final class SessionManagerTests: XCTestCase {
         inputBlocker.shouldThrow = true
         XCTAssertThrowsError(try session.startSession())
         XCTAssertEqual(session.state, .idle)
+        XCTAssertFalse(screenDimmer.isDimmed, "Screen must be restored when startBlocking throws")
     }
 
     func testNoBlackoutWhenDisabled() throws {

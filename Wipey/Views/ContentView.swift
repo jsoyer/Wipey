@@ -16,7 +16,7 @@ struct ContentView: View {
             Divider()
             mascotSection
             Divider()
-            toggleSection
+            toggleSection(session: $session)
             Divider()
             ctaSection
         }
@@ -82,11 +82,12 @@ struct ContentView: View {
     }
 
     // MARK: - Toggles
+    // Takes an explicit @Bindable session binding to avoid creating a second
+    // @Bindable wrapper for the same object inside a nested computed property.
 
-    private var toggleSection: some View {
-        @Bindable var session = session
-
-        return VStack(alignment: .leading, spacing: 0) {
+    @ViewBuilder
+    private func toggleSection(session: Bindable<SessionManager>) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
             Text("section.what_to_clean", comment: "Section label asking the user what to clean")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
@@ -96,17 +97,17 @@ struct ContentView: View {
             LockToggleRow(
                 icon: "keyboard",
                 label: Text("toggle.keyboard", comment: "Toggle for locking keyboard and trackpad"),
-                isOn: $session.config.lockKeyboard
+                isOn: session.config.lockKeyboard
             )
             LockToggleRow(
                 icon: "computermouse",
                 label: Text("toggle.mouse", comment: "Toggle for locking mouse"),
-                isOn: $session.config.lockTrackpad
+                isOn: session.config.lockTrackpad
             )
             LockToggleRow(
                 icon: "rectangle.on.rectangle.slash",
                 label: Text("toggle.screen", comment: "Toggle for screen blackout"),
-                isOn: $session.config.blackoutScreen
+                isOn: session.config.blackoutScreen
             )
         }
         .padding(.vertical, 16)
@@ -164,7 +165,7 @@ struct ContentView: View {
         } catch InputBlockerError.accessibilityPermissionDenied {
             permissionError = true
         } catch {
-            // tapCreationFailed or unknown — nothing useful to show
+            // tapCreationFailed or unknown — session remains idle
         }
     }
 }
@@ -189,69 +190,16 @@ private struct LockToggleRow: View {
     }
 }
 
-// MARK: - MascotView (placeholder — replace with final assets)
+// MARK: - Window level helper (keeps main window always floating above others)
 
-struct MascotView: View {
-
-    enum MascotState { case idle, active, done }
-    let state: MascotState
-
-    var body: some View {
-        Canvas { context, size in
-            let w = size.width
-            let h = size.height
-            let cx = w / 2
-            let cy = h / 2
-
-            // Body
-            let bodyRect = CGRect(x: 0, y: 0, width: w, height: h)
-            context.fill(
-                Path(roundedRect: bodyRect, cornerRadius: w * 0.22),
-                with: .color(.white)
-            )
-
-            // Eyes
-            let eyeY = cy - h * 0.1
-            let eyeR = w * 0.07
-            let eyeSpacing = w * 0.16
-            context.fill(
-                Path(ellipseIn: CGRect(x: cx - eyeSpacing - eyeR, y: eyeY - eyeR, width: eyeR * 2, height: eyeR * 2)),
-                with: .color(.black)
-            )
-            context.fill(
-                Path(ellipseIn: CGRect(x: cx + eyeSpacing - eyeR, y: eyeY - eyeR, width: eyeR * 2, height: eyeR * 2)),
-                with: .color(.black)
-            )
-
-            // Mouth (arc)
-            var mouth = Path()
-            mouth.addArc(
-                center: CGPoint(x: cx, y: cy + h * 0.06),
-                radius: w * 0.2,
-                startAngle: .degrees(20),
-                endAngle: .degrees(160),
-                clockwise: false
-            )
-            context.stroke(mouth, with: .color(.black), lineWidth: 2.5)
-        }
-        .background(
-            RoundedRectangle(cornerRadius: 22)
-                .fill(.white)
-                .shadow(color: .black.opacity(0.12), radius: 8, y: 3)
-        )
+private final class FloatingWindowSetter: NSView {
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        window?.level = .floating
     }
 }
 
-// MARK: - Window level helper (keeps main window floating)
-
 private struct WindowFloatingModifier: NSViewRepresentable {
-    func makeNSView(context: Context) -> NSView {
-        let view = NSView()
-        Task { @MainActor in
-            view.window?.level = .floating
-        }
-        return view
-    }
-
-    func updateNSView(_ nsView: NSView, context: Context) {}
+    func makeNSView(context: Context) -> FloatingWindowSetter { FloatingWindowSetter() }
+    func updateNSView(_ nsView: FloatingWindowSetter, context: Context) {}
 }
