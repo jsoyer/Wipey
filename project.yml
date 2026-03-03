@@ -1,0 +1,144 @@
+# XcodeGen project specification for Wipey
+#
+# Usage:
+#   brew install xcodegen
+#   xcodegen generate
+#
+# Re-run after adding/removing Swift source files or changing build settings.
+# The generated Wipey.xcodeproj is .gitignored — always regenerate from this file.
+
+name: Wipey
+
+options:
+  bundleIdPrefix: app.wipey
+  deploymentTarget:
+    macOS: "13.0"
+  xcodeVersion: "15.4"
+  createIntermediateGroups: true
+  defaultConfig: Debug
+  generateEmptyDirectories: false
+  usesTabs: false
+  indentWidth: 4
+  tabWidth: 4
+
+# ── Local Swift Package ──────────────────────────────────────────────────────
+
+packages:
+  WipeyCore:
+    path: WipeyCore
+
+# ── Project-wide build settings ──────────────────────────────────────────────
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    ALWAYS_SEARCH_USER_PATHS: NO
+    CLANG_ENABLE_MODULES: YES
+
+configs:
+  Debug: debug
+  Release: release
+
+# ── Targets ──────────────────────────────────────────────────────────────────
+
+targets:
+
+  Wipey:
+    type: application
+    platform: macOS
+    deploymentTarget: "13.0"
+
+    # Source files — XcodeGen discovers all .swift files recursively
+    sources:
+      - path: Wipey/App
+      - path: Wipey/Platform
+      - path: Wipey/Views
+
+    # Resource files
+    resources:
+      - path: Wipey/Resources/Assets.xcassets
+      - path: Wipey/Resources/Localizable.xcstrings
+      - path: Wipey/Resources/PrivacyInfo.xcprivacy
+
+    # WipeyCore local package
+    dependencies:
+      - package: WipeyCore
+        product: WipeyCore
+
+    # Generated Info.plist
+    info:
+      path: Wipey/Resources/Info.plist
+      properties:
+        CFBundleName: Wipey
+        CFBundleDisplayName: Wipey
+        CFBundleIdentifier: "$(PRODUCT_BUNDLE_IDENTIFIER)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundlePackageType: APPL
+        CFBundleExecutable: "$(EXECUTABLE_NAME)"
+        LSMinimumSystemVersion: "$(MACOSX_DEPLOYMENT_TARGET)"
+        NSPrincipalClass: NSApplication
+        NSHighResolutionCapable: true
+        NSSupportsAutomaticGraphicsSwitching: true
+        # false = Wipey appears in the Dock by default.
+        # Menu-bar-only mode is handled at runtime by PreferencesManager.menuBarOnly.
+        LSUIElement: false
+        NSHumanReadableCopyright: "Copyright © 2024 Josselin Soyer. MIT License."
+        ITSAppUsesNonExemptEncryption: false
+        # Sparkle auto-update (direct distribution only)
+        SUFeedURL: "https://wipey.app/appcast.xml"
+        SUEnableAutomaticChecks: true
+
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.wipey.mac
+        PRODUCT_NAME: Wipey
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_ENTITLEMENTS: Wipey/Resources/Wipey.entitlements
+        CODE_SIGN_STYLE: Automatic
+        # Set your Apple Developer Team ID here, e.g. "ABCDE12345"
+        DEVELOPMENT_TEAM: ""
+        ENABLE_HARDENED_RUNTIME: YES
+        COMBINE_HIDPI_IMAGES: YES
+        DEAD_CODE_STRIPPING: YES
+        # Universal Binary: Apple Silicon + Intel
+        ARCHS: "$(ARCHS_STANDARD)"
+        ONLY_ACTIVE_ARCH: NO
+
+      configs:
+        Debug:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
+          DEBUG_INFORMATION_FORMAT: dwarf
+          ENABLE_TESTABILITY: YES
+          ONLY_ACTIVE_ARCH: YES
+          MTL_ENABLE_DEBUG_INFO: INCLUDE_SOURCE
+
+        Release:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: ""
+          DEBUG_INFORMATION_FORMAT: "dwarf-with-dsym"
+          ENABLE_TESTABILITY: NO
+          ONLY_ACTIVE_ARCH: NO
+          VALIDATE_PRODUCT: YES
+
+# ── Schemes ──────────────────────────────────────────────────────────────────
+
+schemes:
+
+  Wipey:
+    build:
+      targets:
+        Wipey: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      # WipeyCore unit tests — run via the WipeyCore package scheme
+      # or: cd WipeyCore && swift test
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release

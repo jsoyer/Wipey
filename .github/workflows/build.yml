@@ -7,8 +7,10 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-    name: Build macOS
+
+  # ── WipeyCore unit tests (Swift Package — no xcodeproj needed) ─────────────
+  test-core:
+    name: WipeyCore Tests
     runs-on: macos-14
 
     steps:
@@ -18,25 +20,36 @@ jobs:
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_15.4.app
 
+      - name: Run WipeyCore tests
+        working-directory: WipeyCore
+        run: swift test
+
+  # ── macOS app build (requires XcodeGen to produce the xcodeproj) ──────────
+  build-macos:
+    name: Build macOS app
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
       - name: Build
         run: |
           xcodebuild \
             -project Wipey.xcodeproj \
-            -scheme "Wipey (macOS)" \
+            -scheme Wipey \
             -configuration Debug \
             -destination "platform=macOS" \
             build \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
-
-      - name: Run tests
-        run: |
-          xcodebuild \
-            -project Wipey.xcodeproj \
-            -scheme "WipeyCore" \
-            -destination "platform=macOS" \
-            test \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+    Apple Privacy Manifest — required for App Store submissions (Spring 2024+)
+    and strongly recommended for direct distribution.
+
+    Wipey privacy policy: https://wipey.app/privacy
+    Docs: https://developer.apple.com/documentation/bundleresources/privacy_manifest_files
+-->
+<plist version="1.0">
+<dict>
+
+    <!-- Wipey does NOT participate in any tracking -->
+    <key>NSPrivacyTracking</key>
+    <false/>
+
+    <key>NSPrivacyTrackingDomains</key>
+    <array/>
+
+    <!--
+        Required Reasons APIs used by Wipey:
+
+        UserDefaults (NSPrivacyAccessedAPICategoryUserDefaults)
+        - Used by PreferencesManager to read/write app preferences
+          (session config, remarks style, launch-at-login flag, etc.)
+        - Reason CA92.1: accessed to read and write app preferences stored
+          in the app's own container only.
+    -->
+    <key>NSPrivacyAccessedAPITypes</key>
+    <array>
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>CA92.1</string>
+            </array>
+        </dict>
+    </array>
+
+    <!--
+        Data collected by Wipey (opt-in telemetry via TelemetryDeck only).
+        No data is collected until the user explicitly enables telemetry
+        in Settings → Privacy.
+
+        When opted in, the following anonymous signals are sent:
+        - Session started (count, exit mechanisms enabled, features enabled)
+        - Exit mechanism triggered (type only)
+        - Platform/macOS version, Wipey version
+
+        No keystrokes, personal identifiers, or device fingerprints are collected.
+        TelemetryDeck is GDPR-compliant by design (data is hashed and aggregated).
+    -->
+    <key>NSPrivacyCollectedDataTypes</key>
+    <array>
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypeOtherUsageData</string>
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeAnalytics</string>
+            </array>
+        </dict>
+    </array>
+
+</dict>
+</plist>

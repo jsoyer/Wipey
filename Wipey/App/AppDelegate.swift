@@ -2,6 +2,7 @@ import AppKit
 import SwiftUI
 import LocalAuthentication
 import Observation
+import ServiceManagement
 import WipeyCore
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -32,6 +33,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         setupStatusItem()
         NSApp.activate(ignoringOtherApps: true)
         startObservingSession()
+        startObservingPreferences()
+        // Sync SMAppService with the stored preference on every launch.
+        // This recovers from any state drift (e.g. manual toggle in Login Items).
+        applyLaunchAtLogin(PreferencesManager.shared.launchAtLogin)
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
@@ -131,6 +136,37 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func openSettings() {
         NSApp.activate(ignoringOtherApps: true)
         NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+    }
+
+    // MARK: - Preferences observation
+
+    private func startObservingPreferences() {
+        withObservationTracking {
+            _ = PreferencesManager.shared.launchAtLogin
+        } onChange: { [weak self] in
+            Task { @MainActor in
+                self?.applyLaunchAtLogin(PreferencesManager.shared.launchAtLogin)
+                self?.startObservingPreferences()
+            }
+        }
+    }
+
+    private func applyLaunchAtLogin(_ enabled: Bool) {
+        do {
+            if enabled {
+                if SMAppService.mainApp.status != .enabled {
+                    try SMAppService.mainApp.register()
+                }
+            } else {
+                if SMAppService.mainApp.status == .enabled {
+                    try SMAppService.mainApp.unregister()
+                }
+            }
+        } catch {
+            // Registration can legitimately fail if the app is not in /Applications.
+            // This is expected during development — the preference is still persisted
+            // and re-applied on next launch from the correct location.
+        }
     }
 
     // MARK: - Session observation

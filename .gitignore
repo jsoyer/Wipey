@@ -1,5 +1,6 @@
-# Xcode
-*.xcodeproj/xcuserdata/
+# Xcode — project file is generated from project.yml via XcodeGen, not committed
+# Run: brew install xcodegen && xcodegen generate
+Wipey.xcodeproj/
 *.xcworkspace/xcuserdata/
 *.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
 *.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
