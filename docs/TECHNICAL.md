@@ -12,15 +12,22 @@ No backend, no network calls, minimal dependencies.
 ```
 Wipey.xcodeproj
 ├── WipeyCore/                  ← Swift Package (platform-agnostic)
-│   ├── SessionManager.swift
-│   ├── SessionConfig.swift
-│   ├── ExitMechanism.swift
-│   ├── Protocols/
-│   │   ├── InputBlocker.swift
-│   │   └── ScreenDimmer.swift
-│   └── ExitWatcher.swift
+│   ├── Sources/WipeyCore/
+│   │   ├── Protocols/
+│   │   │   ├── InputBlocker.swift
+│   │   │   └── ScreenDimmer.swift
+│   │   ├── Models/
+│   │   │   ├── SessionConfig.swift
+│   │   │   ├── SessionState.swift
+│   │   │   └── ExitMechanism.swift
+│   │   ├── SessionManager.swift
+│   │   ├── ExitWatcher.swift
+│   │   ├── PreferencesManager.swift
+│   │   └── Remarks.swift
+│   └── Tests/WipeyCoreTests/
+│       └── SessionManagerTests.swift
 │
-├── Wipey (macOS)/              ← Direct distribution target
+├── Wipey/                      ← Direct distribution target
 │   ├── App/
 │   │   ├── WipeyApp.swift
 │   │   └── AppDelegate.swift
@@ -29,9 +36,10 @@ Wipey.xcodeproj
 │   │   └── MacOSScreenDimmer.swift   ← NSWindow blackout
 │   ├── Views/
 │   │   ├── ContentView.swift
+│   │   ├── MascotView.swift
 │   │   ├── SessionView.swift
-│   │   ├── SettingsView.swift
 │   │   ├── HUDView.swift
+│   │   ├── SettingsView.swift
 │   │   └── PermissionView.swift
 │   └── Resources/
 │       ├── Assets.xcassets
@@ -59,10 +67,15 @@ Wipey.xcodeproj
 
 ```swift
 // InputBlocker.swift
-protocol InputBlocker: AnyObject {
+public protocol InputBlocker: AnyObject {
+    /// Start intercepting input according to the session configuration.
+    /// Throws `InputBlockerError` if the system denies access.
     func startBlocking(config: SessionConfig) throws
     func stopBlocking()
     var isBlocking: Bool { get }
+    /// Set by SessionManager before startBlocking is called.
+    /// The platform implementation must route intercepted events through this watcher.
+    var exitWatcher: ExitWatcher? { get set }
 }
 
 // ScreenDimmer.swift
@@ -87,18 +100,27 @@ idle → starting → active → ending → idle
 
 ```swift
 @Observable
-class SessionManager {
-    var state: SessionState = .idle
-    var elapsedSeconds: Int = 0
+public final class SessionManager {
+    // Observed by SwiftUI views
+    public var state: SessionState = .idle
+    public var secondsRemaining: Int = 0  // > 0 only when .autoTimer is enabled
+    public var config: SessionConfig
 
-    private let inputBlocker: InputBlocker
-    private let screenDimmer: ScreenDimmer
-    private let exitWatcher: ExitWatcher
+    // Dependencies injected at init — SessionManager never imports AppKit/UIKit
+    public init(
+        inputBlocker: InputBlocker,
+        screenDimmer: ScreenDimmer,
+        config: SessionConfig = SessionConfig()
+    ) { ... }
 
-    init(inputBlocker: InputBlocker, screenDimmer: ScreenDimmer) { ... }
+    /// Transitions idle → starting → active.
+    /// Throws InputBlockerError if the system denies the event tap.
+    /// Rolls back (restores screen, resets state) if startBlocking throws.
+    public func startSession() throws { ... }
 
-    func startSession(config: SessionConfig) throws { ... }
-    func endSession() { ... }
+    /// Transitions active → ending → idle.
+    /// Idempotent — safe to call from multiple exit mechanisms concurrently.
+    public func endSession() { ... }
 }
 ```
 
@@ -125,16 +147,24 @@ let tap = CGEvent.tapCreate(
     options: .defaultTap,
     eventsOfInterest: eventMask,
     callback: { proxy, type, event, userInfo in
+        guard let userInfo else { return Unmanaged.passRetained(event) }
         let blocker = Unmanaged<MacOSInputBlocker>
-            .fromOpaque(userInfo!).takeUnretainedValue()
-        // Let exit watcher inspect the event before consuming it
-        if blocker.exitWatcher.shouldUnlock(type: type, event: event) {
-            SessionManager.shared.endSession()
+            .fromOpaque(userInfo).takeUnretainedValue()
+        // The CGEventTap callback fires on a system thread — dispatch to main
+        // before touching any Swift state or SwiftUI-observed properties.
+        if let watcher = blocker.exitWatcher {
+            DispatchQueue.main.async {
+                watcher.process(type: type, event: event)
+            }
         }
-        return nil  // consume / block the event
+        return nil  // consume / block the event; never forward to other apps
     },
     userInfo: Unmanaged.passUnretained(self).toOpaque()
 )
+
+// ExitWatcher signals unlock via a callback, not a return value:
+//   exitWatcher.onUnlock = { [weak self] in self?.endSession() }
+// Set by SessionManager before startBlocking is called.
 ```
 
 **Accessibility permission required**: `CGEventTap` with `.defaultTap` needs the
@@ -249,13 +279,15 @@ Format: `Localizable.xcstrings` (Xcode 15+)
 ## Telemetry (TelemetryDeck)
 
 ```swift
-// Only called if user has opted in
+// Only called if user has opted in (PreferencesManager.shared.telemetryOptIn)
 import TelemetryDeck
 
 TelemetryDeck.signal("session.started", parameters: [
-    "exitMechanisms": config.exitMechanisms.map(\.rawValue).joined(separator: ","),
-    "blackoutEnabled": String(config.blackoutEnabled),
-    "inputLockEnabled": String(config.inputLockEnabled),
+    "exitMechanisms": config.enabledExitMechanisms
+        .map(\.rawValue).sorted().joined(separator: ","),
+    "blackoutEnabled": String(config.blackoutScreen),
+    "keyboardLocked": String(config.lockKeyboard),
+    "trackpadLocked": String(config.lockTrackpad),
 ])
 ```
 
