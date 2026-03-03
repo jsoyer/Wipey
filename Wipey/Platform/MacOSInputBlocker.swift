@@ -5,6 +5,9 @@ import WipeyCore
 /// macOS implementation of InputBlocker using CGEventTap.
 /// Requires Accessibility permission (AXIsProcessTrusted()).
 /// The event tap intercepts all input at the session level before any app receives it.
+///
+/// Thread safety: the CGEventTap callback fires on the system event-tap thread.
+/// All ExitWatcher access is dispatched to the main queue to avoid data races.
 public final class MacOSInputBlocker: InputBlocker {
 
     public private(set) var isBlocking = false
@@ -14,6 +17,12 @@ public final class MacOSInputBlocker: InputBlocker {
     private var runLoopSource: CFRunLoopSource?
 
     public init() {}
+
+    deinit {
+        // Guarantee the tap is disabled before this object is deallocated.
+        // Without this, the system could invoke the C callback with a dangling userInfo pointer.
+        stopBlocking()
+    }
 
     // MARK: - InputBlocker
 
@@ -71,6 +80,9 @@ private let blockedEventTypes: [CGEventType] = [
 ]
 
 // MARK: - C callback (no captures — uses userInfo to reach the blocker)
+//
+// This function runs on the system CGEventTap thread, NOT the main thread.
+// ExitWatcher state mutations are dispatched to the main queue for thread safety.
 
 private func wipeyEventTapCallback(
     proxy: CGEventTapProxy,
@@ -80,6 +92,14 @@ private func wipeyEventTapCallback(
 ) -> Unmanaged<CGEvent>? {
     guard let userInfo else { return Unmanaged.passRetained(event) }
     let blocker = Unmanaged<MacOSInputBlocker>.fromOpaque(userInfo).takeUnretainedValue()
-    blocker.exitWatcher?.process(type: type, event: event)
-    return nil // consume / block the event
+
+    // Dispatch ExitWatcher processing to the main thread.
+    // The event is already consumed (nil return) — this dispatch only decides whether to unlock.
+    if let watcher = blocker.exitWatcher {
+        DispatchQueue.main.async {
+            watcher.process(type: type, event: event)
+        }
+    }
+
+    return nil // consume / block the event regardless
 }

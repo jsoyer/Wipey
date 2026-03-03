@@ -6,10 +6,13 @@ import Observation
 ///
 /// SessionManager is platform-agnostic — it only depends on protocols.
 /// Inject platform-specific implementations at the app entry point.
+///
+/// Thread safety: all public methods must be called from the main thread.
+/// The countdown timer is explicitly scheduled on the main run loop.
 @Observable
 public final class SessionManager {
 
-    // MARK: - Published state
+    // MARK: - Observable state
 
     public var state: SessionState = .idle
     public var secondsRemaining: Int = 0
@@ -40,6 +43,11 @@ public final class SessionManager {
         self.exitWatcher.onUnlock = { [weak self] in
             self?.endSession()
         }
+    }
+
+    deinit {
+        // Guard against a session left active at teardown (e.g. process crash path).
+        countdownTimer?.invalidate()
     }
 
     // MARK: - Session control
@@ -73,7 +81,9 @@ public final class SessionManager {
     }
 
     public func endSession() {
-        guard state.isActive || state == .ending else { return }
+        // Strict guard: only accept the first endSession() call while active.
+        // Using .isActive (not .ending) prevents a second call from re-running cleanup.
+        guard state.isActive else { return }
         state = .ending
 
         countdownTimer?.invalidate()
@@ -96,13 +106,16 @@ public final class SessionManager {
         guard config.isEnabled(.autoTimer) else { return }
         secondsRemaining = Int(config.timerDuration)
 
-        countdownTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+        // Explicitly schedule on the main run loop so the callback is always
+        // delivered on the main thread, regardless of which thread startSession() was called from.
+        let timer = Timer(timeInterval: 1, repeats: true) { [weak self] _ in
             guard let self else { return }
             self.secondsRemaining -= 1
             if self.secondsRemaining <= 0 {
                 self.endSession()
             }
         }
+        RunLoop.main.add(timer, forMode: .common)
+        countdownTimer = timer
     }
 }
-

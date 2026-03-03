@@ -19,6 +19,9 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
+            if session.state.isActive {
+                sessionActiveWarning
+            }
             exitMechanismsSection
             behaviorSection
             remarksSection
@@ -28,9 +31,14 @@ struct SettingsView: View {
         .formStyle(.grouped)
         .frame(width: 440)
         .fixedSize(horizontal: false, vertical: true)
+        // Disable the entire form while a session is active.
+        // Changing exit mechanisms mid-session (especially removing all of them)
+        // could leave the user unable to exit.
+        .disabled(session.state.isActive)
         .onAppear(perform: loadFromPrefs)
         .onChange(of: config) { _, new in
-            session.config = new
+            // Only update preferences — not the live session config.
+            // Changes take effect at the start of the next session.
             PreferencesManager.shared.sessionConfig = new
         }
         .onChange(of: remarksStyle) { _, new in PreferencesManager.shared.remarksStyle = new }
@@ -38,6 +46,20 @@ struct SettingsView: View {
         .onChange(of: showInMenuBar) { _, new in PreferencesManager.shared.showInMenuBar = new }
         .onChange(of: menuBarOnly) { _, new in PreferencesManager.shared.menuBarOnly = new }
         .onChange(of: telemetryOptIn) { _, new in PreferencesManager.shared.telemetryOptIn = new }
+    }
+
+    // MARK: - Session active banner
+
+    private var sessionActiveWarning: some View {
+        Section {
+            HStack(spacing: 8) {
+                Image(systemName: "lock.fill")
+                    .foregroundStyle(.orange)
+                Text("settings.session_active_warning", comment: "Warning shown when a session is active and settings are locked")
+                    .foregroundStyle(.secondary)
+                    .font(.callout)
+            }
+        }
     }
 
     // MARK: - Exit mechanisms

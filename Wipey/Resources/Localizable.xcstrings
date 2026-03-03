@@ -162,6 +162,13 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Commencer le nettoyage" } }
       }
     },
+    "settings.session_active_warning" : {
+      "comment" : "Warning shown when a session is active and settings are locked",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Settings are locked while a session is active." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Les réglages sont verrouillés pendant une session active." } }
+      }
+    },
     "settings.always_on" : {
       "comment" : "Label for a mechanism that cannot be disabled",
       "localizations" : {

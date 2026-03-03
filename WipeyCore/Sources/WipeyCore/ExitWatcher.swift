@@ -1,9 +1,20 @@
 import Foundation
 import CoreGraphics
 
+// MARK: - macOS key codes
+
+/// Well-known macOS virtual key codes referenced by ExitWatcher.
+private enum KeyCode {
+    /// Escape key (virtual key code on all Apple keyboards).
+    static let escape: Int64 = 53
+}
+
 /// Monitors input events during a session and fires `onUnlock` when an
 /// exit condition is met. Works alongside the CGEventTap — events are routed
 /// here before being consumed.
+///
+/// Thread safety: must be called from the main thread only.
+/// (MacOSInputBlocker dispatches CGEventTap events to the main queue before calling process().)
 public final class ExitWatcher {
 
     public var onUnlock: (() -> Void)?
@@ -39,8 +50,7 @@ public final class ExitWatcher {
 
         if type == .keyDown {
             let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
-            // Escape key = keyCode 53
-            if keyCode == 53 {
+            if keyCode == KeyCode.escape {
                 if config.isEnabled(.holdKey)     && checkHoldKey(config: config) { return true }
                 if config.isEnabled(.keySequence) && checkKeySequence(config: config) { return true }
             }
@@ -48,7 +58,7 @@ public final class ExitWatcher {
 
         if type == .keyUp {
             let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
-            if keyCode == 53 {
+            if keyCode == KeyCode.escape {
                 holdKeyStartTime = nil
             }
         }

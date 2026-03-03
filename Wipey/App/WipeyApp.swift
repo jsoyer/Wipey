@@ -26,9 +26,9 @@ struct WipeyApp: App {
 
 private struct RootView: View {
 
-    @Environment(SessionManager.self) private var session
     @State private var hasPermission = AXIsProcessTrusted()
 
+    // Polls every second while permission is missing, then stops automatically.
     private let permissionTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
@@ -40,9 +40,8 @@ private struct RootView: View {
             }
         }
         .onReceive(permissionTimer) { _ in
-            if !hasPermission {
-                hasPermission = AXIsProcessTrusted()
-            }
+            guard !hasPermission else { return } // stop doing work once granted
+            hasPermission = AXIsProcessTrusted()
         }
     }
 }
