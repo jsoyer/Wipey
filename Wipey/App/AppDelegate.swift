@@ -3,6 +3,8 @@ import SwiftUI
 import LocalAuthentication
 import Observation
 import ServiceManagement
+import Sparkle
+import TelemetryDeck
 import WipeyCore
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -23,24 +25,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - UI
 
-    private var statusItem: NSStatusItem!
+    // Optional — can be removed at runtime when showInMenuBar is false
+    private var statusItem: NSStatusItem?
     private var sessionHUDWindow: NSWindow?
     private var laContext: LAContext?
+
+    // Single Sparkle controller for the whole app — starts update checks on launch
+    // and is the target for the "Check for Updates…" menu action.
+    private let sparkleController = SPUStandardUpdaterController(
+        startingUpdater: true,
+        updaterDelegate: nil,
+        userDriverDelegate: nil
+    )
 
     // MARK: - Lifecycle
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        setupStatusItem()
+        configureTelemetryDeck()
+        applyMenuBarSettings()          // sets statusItem and activation policy
         NSApp.activate(ignoringOtherApps: true)
         startObservingSession()
         startObservingPreferences()
-        // Sync SMAppService with the stored preference on every launch.
-        // This recovers from any state drift (e.g. manual toggle in Login Items).
         applyLaunchAtLogin(PreferencesManager.shared.launchAtLogin)
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         if !flag {
+            NSApp.activate(ignoringOtherApps: true)
             NSApp.windows.first(where: { !$0.isFloatingPanel })?.makeKeyAndOrderFront(nil)
         }
         return true
@@ -49,13 +60,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Status item
 
     private func setupStatusItem() {
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-        guard let button = statusItem.button else { return }
+        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+        guard let button = item.button else { return }
         button.image = NSImage(systemSymbolName: "sparkles", accessibilityDescription: "Wipey")
         button.image?.isTemplate = true
         button.target = self
         button.action = #selector(statusItemClicked(_:))
         button.sendAction(on: [.leftMouseUp, .rightMouseUp])
+        statusItem = item
     }
 
     @objc private func statusItemClicked(_ sender: NSStatusBarButton) {
@@ -68,6 +80,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func showContextMenu() {
+        guard let statusItem else { return }
         let menu = NSMenu()
 
         if sessionManager.state.isActive {
@@ -106,6 +119,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         settings.target = self
         menu.addItem(settings)
 
+        let checkUpdates = NSMenuItem(
+            title: String(localized: "menu.check_updates", comment: "Menu item to check for app updates"),
+            action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)),
+            keyEquivalent: ""
+        )
+        checkUpdates.target = sparkleController
+        menu.addItem(checkUpdates)
+
         menu.addItem(.separator())
 
         let quit = NSMenuItem(
@@ -138,17 +159,55 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
     }
 
+    // MARK: - TelemetryDeck
+
+    private func configureTelemetryDeck() {
+        guard let appID = Bundle.main.infoDictionary?["TelemetryDeckAppID"] as? String,
+              !appID.isEmpty else { return }
+        TelemetryDeck.initialize(config: .init(appID: appID))
+    }
+
+    /// Sends a signal only when the user has opted in to telemetry.
+    private func sendTelemetry(_ signal: String, parameters: [String: String] = [:]) {
+        guard PreferencesManager.shared.telemetryOptIn else { return }
+        TelemetryDeck.signal(signal, parameters: parameters)
+    }
+
     // MARK: - Preferences observation
 
     private func startObservingPreferences() {
         withObservationTracking {
             _ = PreferencesManager.shared.launchAtLogin
+            _ = PreferencesManager.shared.showInMenuBar
+            _ = PreferencesManager.shared.menuBarOnly
         } onChange: { [weak self] in
             Task { @MainActor in
-                self?.applyLaunchAtLogin(PreferencesManager.shared.launchAtLogin)
+                let prefs = PreferencesManager.shared
+                self?.applyLaunchAtLogin(prefs.launchAtLogin)
+                self?.applyMenuBarSettings()
                 self?.startObservingPreferences()
             }
         }
+    }
+
+    // MARK: - Menu bar visibility
+
+    @MainActor
+    private func applyMenuBarSettings() {
+        let prefs = PreferencesManager.shared
+
+        if prefs.showInMenuBar {
+            if statusItem == nil { setupStatusItem() }
+        } else {
+            if let item = statusItem {
+                NSStatusBar.system.removeStatusItem(item)
+                statusItem = nil
+            }
+        }
+
+        // .accessory = hidden from Dock, accessible only via menu bar
+        // .regular   = visible in Dock (default behaviour)
+        NSApp.setActivationPolicy(prefs.menuBarOnly ? .accessory : .regular)
     }
 
     private func applyLaunchAtLogin(_ enabled: Bool) {
@@ -188,6 +247,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         case .active:
             showSessionHUD()
             initiateLocalAuthIfNeeded()
+            sendTelemetry("session.started", parameters: [
+                "exitMechanisms": sessionManager.config.enabledExitMechanisms
+                    .map(\.rawValue).sorted().joined(separator: ","),
+                "blackoutEnabled": String(sessionManager.config.blackoutScreen),
+                "keyboardLocked": String(sessionManager.config.lockKeyboard),
+                "trackpadLocked": String(sessionManager.config.lockTrackpad),
+            ])
         case .idle:
             closeSessionHUD()
             cancelLocalAuth()

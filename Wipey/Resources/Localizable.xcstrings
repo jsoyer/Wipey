@@ -316,6 +316,13 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Souris" } }
       }
     },
+    "menu.check_updates" : {
+      "comment" : "Menu item to check for app updates via Sparkle",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Check for Updates…" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Rechercher des mises à jour…" } }
+      }
+    },
     "toggle.screen" : {
       "comment" : "Toggle for screen blackout",
       "localizations" : {

@@ -21,11 +21,22 @@ options:
   indentWidth: 4
   tabWidth: 4
 
-# ── Local Swift Package ──────────────────────────────────────────────────────
+# ── Packages ─────────────────────────────────────────────────────────────────
 
 packages:
   WipeyCore:
     path: WipeyCore
+
+  # Auto-update (direct distribution only — not used in App Store target)
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    from: 2.0.0
+
+  # Opt-in anonymous telemetry — see docs/DECISIONS.md for collected signals
+  # Set TelemetryDeckAppID in Info.plist (below) to activate; leave empty to disable
+  TelemetryDeck:
+    url: https://github.com/TelemetryDeck/SwiftSDK
+    from: 2.0.0
 
 # ── Project-wide build settings ──────────────────────────────────────────────
 
@@ -62,10 +73,13 @@ targets:
       - path: Wipey/Resources/Localizable.xcstrings
       - path: Wipey/Resources/PrivacyInfo.xcprivacy
 
-    # WipeyCore local package
     dependencies:
       - package: WipeyCore
         product: WipeyCore
+      - package: Sparkle
+        product: Sparkle
+      - package: TelemetryDeck
+        product: TelemetryDeck
 
     # Generated Info.plist
     info:
@@ -90,6 +104,9 @@ targets:
         # Sparkle auto-update (direct distribution only)
         SUFeedURL: "https://wipey.app/appcast.xml"
         SUEnableAutomaticChecks: true
+        # TelemetryDeck App ID — get yours at telemetrydeck.com
+        # Leave empty string to disable telemetry collection entirely
+        TelemetryDeckAppID: ""
 
     settings:
       base:

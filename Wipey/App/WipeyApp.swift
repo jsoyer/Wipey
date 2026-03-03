@@ -6,6 +6,7 @@ import WipeyCore
 struct WipeyApp: App {
 
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+    // Sparkle is managed entirely by AppDelegate (single SPUStandardUpdaterController)
 
     var body: some Scene {
         WindowGroup {
