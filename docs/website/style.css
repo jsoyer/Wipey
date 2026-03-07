@@ -2,18 +2,31 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --blue:    #3B82F6;
-  --cyan:    #06B6D4;
-  --dark:    #0F172A;
-  --surface: #1E293B;
-  --text:    #0F172A;
-  --muted:   #64748B;
-  --border:  #E2E8F0;
-  --white:   #FFFFFF;
+  --blue:      #3B82F6;
+  --cyan:      #06B6D4;
+  --dark:      #0F172A;
+  --surface:   #1E293B;
+  --text:      #0F172A;
+  --muted:     #64748B;
+  --border:    #E2E8F0;
+  --bg:        #FFFFFF;
+  --bg-subtle: #F8FAFC;
+  --card-bg:   #FFFFFF;
 
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 20px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text:      #F1F5F9;
+    --muted:     #94A3B8;
+    --border:    #1E293B;
+    --bg:        #0A0F1E;
+    --bg-subtle: #0F172A;
+    --card-bg:   #1E293B;
+  }
 }
 
 html { scroll-behavior: smooth; }
@@ -23,7 +36,7 @@ body {
   font-size: 16px;
   line-height: 1.6;
   color: var(--text);
-  background: var(--white);
+  background: var(--bg);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -84,7 +97,7 @@ nav {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(255,255,255,0.88);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
@@ -180,7 +193,13 @@ h1 {
   max-width: 380px;
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 32px 80px rgba(15,23,42,0.22), 0 0 0 1px rgba(15,23,42,0.08);
+  box-shadow: 0 32px 80px rgba(15,23,42,0.35), 0 0 0 1px rgba(15,23,42,0.12);
+}
+
+@media (prefers-color-scheme: dark) {
+  .mockup-window {
+    box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
+  }
 }
 
 .mockup-bar {
@@ -285,7 +304,7 @@ h1 {
 
 /* ===== Features ===== */
 .features {
-  background: #F8FAFC;
+  background: var(--bg-subtle);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   padding: 96px 24px;
@@ -309,7 +328,7 @@ h1 {
 }
 
 .feature-card {
-  background: white;
+  background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 28px;
@@ -353,7 +372,7 @@ h1 {
 }
 .remark {
   padding: 20px 20px;
-  background: #F8FAFC;
+  background: var(--bg-subtle);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   font-size: 14px;
@@ -423,6 +442,7 @@ h1 {
 
 /* ===== Footer ===== */
 footer {
+  background: var(--bg);
   border-top: 1px solid var(--border);
   padding: 48px 24px;
 }
