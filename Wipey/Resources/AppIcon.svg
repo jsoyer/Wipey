@@ -1,0 +1,126 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+
+    <!-- Background: blue top-left → cyan bottom-right -->
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#06B6D4"/>
+    </linearGradient>
+
+    <!-- Background inner glow top-left -->
+    <radialGradient id="bgGlow" cx="25%" cy="22%" r="52%">
+      <stop offset="0%" stop-color="white" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="white" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Wipe streak: transparent → white → cyan -->
+    <linearGradient id="streakGrad" gradientUnits="userSpaceOnUse"
+                    x1="120" y1="600" x2="870" y2="548">
+      <stop offset="0%"   stop-color="white"   stop-opacity="0"/>
+      <stop offset="28%"  stop-color="white"   stop-opacity="0.88"/>
+      <stop offset="78%"  stop-color="white"   stop-opacity="0.92"/>
+      <stop offset="100%" stop-color="#06B6D4" stop-opacity="0.55"/>
+    </linearGradient>
+
+    <!-- Cloth body: white → very light grey -->
+    <linearGradient id="clothGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#EEF1F6"/>
+    </linearGradient>
+
+    <!-- Microfiber dot texture -->
+    <pattern id="dotTex" x="0" y="0" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="11" cy="11" r="2.3" fill="rgba(80,100,150,0.07)"/>
+    </pattern>
+
+    <!-- Cloth drop shadow -->
+    <filter id="clothShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="14" stdDeviation="24" flood-color="#0F172A" flood-opacity="0.22"/>
+    </filter>
+
+    <!-- Streak glow: blur + source on top -->
+    <filter id="streakGlow" x="-5%" y="-500%" width="110%" height="1100%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="9" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Sparkle glow -->
+    <filter id="sparkleGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- macOS superellipse clip -->
+    <clipPath id="iconClip">
+      <rect width="1024" height="1024" rx="230" ry="230"/>
+    </clipPath>
+
+  </defs>
+
+  <g clip-path="url(#iconClip)">
+
+    <!-- Background -->
+    <rect width="1024" height="1024" fill="url(#bgGrad)"/>
+    <rect width="1024" height="1024" fill="url(#bgGlow)"/>
+
+    <!-- Wipe streak (behind cloth) -->
+    <path d="M 120 608 Q 420 572 512 562 Q 640 550 872 542"
+          stroke="url(#streakGrad)" stroke-width="20" stroke-linecap="round" fill="none"
+          filter="url(#streakGlow)"/>
+
+    <!-- Cloth character: centered, -8° tilt (wipe motion) -->
+    <g transform="translate(512, 472) rotate(-8)" filter="url(#clothShadow)">
+
+      <!-- Body -->
+      <rect x="-170" y="-182" width="340" height="340" rx="76" fill="url(#clothGrad)"/>
+      <!-- Microfiber texture -->
+      <rect x="-170" y="-182" width="340" height="340" rx="76" fill="url(#dotTex)"/>
+      <!-- Subtle border -->
+      <rect x="-170" y="-182" width="340" height="340" rx="76"
+            fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="1.5"/>
+
+      <!-- Left eye -->
+      <ellipse cx="-62" cy="-28" rx="25" ry="25" fill="#1E293B"/>
+      <!-- Right eye -->
+      <ellipse cx="62" cy="-28" rx="25" ry="25" fill="#1E293B"/>
+
+      <!-- Eye shine (top-left of each eye) -->
+      <circle cx="-52" cy="-41" r="9" fill="white" opacity="0.42"/>
+      <circle cx="72"  cy="-41" r="9" fill="white" opacity="0.42"/>
+
+      <!-- Cheeks -->
+      <ellipse cx="-110" cy="24" rx="32" ry="22" fill="#FCA5A5" opacity="0.34"/>
+      <ellipse cx="110"  cy="24" rx="32" ry="22" fill="#FCA5A5" opacity="0.34"/>
+
+      <!-- Smile -->
+      <path d="M -74 70 Q 0 126 74 70"
+            stroke="#1E293B" stroke-width="13" stroke-linecap="round" fill="none"/>
+
+    </g>
+
+    <!-- Main sparkle — end of streak, right side -->
+    <g transform="translate(848, 544)" filter="url(#sparkleGlow)">
+      <path d="M 0,-46 L 8,-8 L 46,0 L 8,8 L 0,46 L -8,8 L -46,0 L -8,-8 Z"
+            fill="white" opacity="0.95"/>
+    </g>
+
+    <!-- Secondary sparkle (smaller, above-right) -->
+    <g transform="translate(892, 492)">
+      <path d="M 0,-25 L 4,-4 L 25,0 L 4,4 L 0,25 L -4,4 L -25,0 L -4,-4 Z"
+            fill="white" opacity="0.70"/>
+    </g>
+
+    <!-- Tiny sparkle (left of main) -->
+    <g transform="translate(800, 500)">
+      <path d="M 0,-15 L 2.5,-2.5 L 15,0 L 2.5,2.5 L 0,15 L -2.5,2.5 L -15,0 L -2.5,-2.5 Z"
+            fill="white" opacity="0.52"/>
+    </g>
+
+  </g>
+</svg>

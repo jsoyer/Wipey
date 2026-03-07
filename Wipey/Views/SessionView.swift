@@ -9,7 +9,7 @@ struct SessionView: View {
 
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            Color.wipeyDark.ignoresSafeArea()
 
             VStack(spacing: 24) {
                 MascotView(state: .active)
@@ -28,6 +28,7 @@ struct SessionView: View {
                         .font(.system(size: 48, weight: .thin, design: .rounded))
                         .foregroundStyle(.white)
                         .monospacedDigit()
+                        .shadow(color: Color.wipeyCyan.opacity(0.55), radius: 12)
                 }
 
                 exitHint

@@ -21,12 +21,13 @@ struct ContentView: View {
             ctaSection
         }
         .frame(width: 380, height: 480)
-        .background(WindowFloatingModifier())
         .onChange(of: session.config) { _, new in
             PreferencesManager.shared.sessionConfig = new
         }
         .onAppear {
             remark = Remarks.idle(style: PreferencesManager.shared.remarksStyle)
+            // Set floating level only for main window
+            setMainWindowFloating()
         }
         .alert(
             Text("permission.alert.title", comment: "Alert title when accessibility is denied"),
@@ -49,10 +50,15 @@ struct ContentView: View {
         HStack {
             Text("app.name", comment: "Application name shown in the window title")
                 .font(.headline)
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [.wipeyBlue, .wipeyCyan],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
             Spacer()
-            Button {
-                NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-            } label: {
+            SettingsLink {
                 Image(systemName: "gearshape")
                     .imageScale(.medium)
             }
@@ -127,10 +133,19 @@ struct ContentView: View {
                 Text("session.start.button", comment: "CTA to start a cleaning session")
                     .font(.headline)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 4)
+                    .padding(.vertical, 10)
+                    .foregroundStyle(.white)
+                    .background(
+                        LinearGradient(
+                            colors: [.wipeyBlue, .wipeyCyan],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                        .opacity(session.state.isActive ? 0.4 : 1.0)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
             }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
+            .buttonStyle(.plain)
             .padding(.horizontal, 16)
             .disabled(session.state.isActive)
 
@@ -172,6 +187,19 @@ struct ContentView: View {
             // tapCreationFailed or unknown — session remains idle
         }
     }
+    
+    private func setMainWindowFloating() {
+        // Find the main window (non-panel, contains ContentView)
+        DispatchQueue.main.async {
+            if let window = NSApp.windows.first(where: { 
+                !$0.title.contains("Settings") && 
+                $0.isVisible && 
+                !($0 is NSPanel) 
+            }) {
+                window.level = .floating
+            }
+        }
+    }
 }
 
 // MARK: - LockToggleRow
@@ -194,16 +222,3 @@ private struct LockToggleRow: View {
     }
 }
 
-// MARK: - Window level helper (keeps main window always floating above others)
-
-private final class FloatingWindowSetter: NSView {
-    override func viewDidMoveToWindow() {
-        super.viewDidMoveToWindow()
-        window?.level = .floating
-    }
-}
-
-private struct WindowFloatingModifier: NSViewRepresentable {
-    func makeNSView(context: Context) -> FloatingWindowSetter { FloatingWindowSetter() }
-    func updateNSView(_ nsView: FloatingWindowSetter, context: Context) {}
-}
