@@ -61,14 +61,14 @@ targets:
     platform: macOS
     deploymentTarget: "14.0"
 
-    # Source files — XcodeGen discovers all .swift files recursively
+    # Source files — XcodeGen discovers all .swift files recursively.
+    # Resource files are listed here too: XcodeGen detects file type and
+    # places each file in the correct build phase automatically.
     sources:
       - path: Wipey/App
       - path: Wipey/Platform
       - path: Wipey/Views
-
-    # Resource files
-    resources:
+      - path: Wipey/Resources/AppIcon.icns
       - path: Wipey/Resources/Assets.xcassets
       - path: Wipey/Resources/Localizable.xcstrings
       - path: Wipey/Resources/PrivacyInfo.xcprivacy
@@ -87,6 +87,7 @@ targets:
       properties:
         CFBundleName: Wipey
         CFBundleDisplayName: Wipey
+        CFBundleIconFile: AppIcon
         CFBundleIdentifier: "$(PRODUCT_BUNDLE_IDENTIFIER)"
         CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         CFBundleShortVersionString: "$(MARKETING_VERSION)"
