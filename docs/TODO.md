@@ -12,6 +12,21 @@
 - [x] Domain `wipey.app` — purchased ✅
 - [ ] Generate logo using prompts from `docs/DESIGN.md`
 
+## SEO & Marketing
+
+### Priorité haute
+- [ ] Créer `og.png` (1200×630px) et l'ajouter dans `docs/website/` — sans ça les partages Twitter/LinkedIn n'ont pas de preview
+- [ ] Soumettre `wipey.app` dans **Google Search Console** + envoyer le sitemap (`https://wipey.app/sitemap.xml`)
+- [ ] Soumettre sur **Product Hunt** (launch = pic de trafic + backlink fort)
+- [ ] Soumettre sur [AlternativeTo](https://alternativeto.net) (catégorie "Keyboard lock")
+- [ ] Soumettre sur [MacUpdate](https://www.macupdate.com) et [Softpedia Mac](https://mac.softpedia.com)
+- [ ] Posts Reddit : r/macapps, r/MacOS, r/apple
+
+### Priorité moyenne
+- [ ] Héberger la font Inter en local pour améliorer le LCP (Core Web Vitals)
+- [ ] Article de blog "How to safely clean your MacBook screen" pour capter du trafic long-tail
+- [ ] Viser les mots-clés : "mac keyboard lock app", "how to clean mac screen without clicking", "mac screen cleaning mode"
+
 ## Before first release
 
 - [ ] Apple Developer account ($99/year) if not already active
