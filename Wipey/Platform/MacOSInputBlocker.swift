@@ -27,14 +27,15 @@ public final class MacOSInputBlocker: InputBlocker {
     // MARK: - InputBlocker
 
     public func startBlocking(config: SessionConfig) throws {
-        guard AXIsProcessTrusted() else {
-            throw InputBlockerError.accessibilityPermissionDenied
-        }
-
         let mask = blockedEventTypes.reduce(CGEventMask(0)) { acc, type in
             acc | (CGEventMask(1) << type.rawValue)
         }
 
+        // Attempt tap creation directly — this is the authoritative test for
+        // whether CGEventTap access is available. AXIsProcessTrusted() is only
+        // used post-failure to distinguish "no permission" from other failures,
+        // because TCC can return stale results for the current binary (e.g. in
+        // development where the code signature changes on every build).
         guard let tap = CGEvent.tapCreate(
             tap: .cgSessionEventTap,
             place: .headInsertEventTap,
@@ -43,7 +44,9 @@ public final class MacOSInputBlocker: InputBlocker {
             callback: wipeyEventTapCallback,
             userInfo: Unmanaged.passUnretained(self).toOpaque()
         ) else {
-            throw InputBlockerError.tapCreationFailed
+            throw AXIsProcessTrusted()
+                ? InputBlockerError.tapCreationFailed
+                : InputBlockerError.accessibilityPermissionDenied
         }
 
         let source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0)
