@@ -6,7 +6,6 @@ struct ContentView: View {
 
     @Environment(SessionManager.self) private var session
     @State private var remark = ""
-    @State private var permissionError = false
 
     var body: some View {
         @Bindable var session = session
@@ -26,19 +25,6 @@ struct ContentView: View {
         }
         .onAppear {
             remark = Remarks.idle(style: PreferencesManager.shared.remarksStyle)
-        }
-        .alert(
-            Text("permission.alert.title", comment: "Alert title when accessibility is denied"),
-            isPresented: $permissionError
-        ) {
-            Button(String(localized: "permission.alert.open_settings", comment: "Button to open System Settings")) {
-                if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
-                    NSWorkspace.shared.open(url)
-                }
-            }
-            Button(String(localized: "common.cancel", comment: "Cancel button"), role: .cancel) {}
-        } message: {
-            Text("permission.alert.message", comment: "Alert message explaining why accessibility is needed")
         }
     }
 
@@ -180,7 +166,11 @@ struct ContentView: View {
         do {
             try session.startSession()
         } catch InputBlockerError.accessibilityPermissionDenied {
-            permissionError = true
+            // Trigger the native macOS accessibility permission dialog.
+            // On macOS 13+, this opens System Settings > Privacy > Accessibility
+            // with Wipey pre-selected. The user just needs to toggle the switch.
+            let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true]
+            AXIsProcessTrustedWithOptions(options as CFDictionary)
         } catch {
             // tapCreationFailed or unknown — session remains idle
         }
