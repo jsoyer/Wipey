@@ -1,6 +1,7 @@
 import SwiftUI
 import AppKit
 import WipeyCore
+import Combine
 
 @main
 struct WipeyApp: App {
@@ -28,9 +29,7 @@ struct WipeyApp: App {
 private struct RootView: View {
 
     @State private var hasPermission = AXIsProcessTrusted()
-
-    // Polls every second while permission is missing, then stops automatically.
-    private let permissionTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    @State private var timerCancellable: AnyCancellable?
 
     var body: some View {
         Group {
@@ -40,9 +39,29 @@ private struct RootView: View {
                 PermissionView()
             }
         }
-        .onReceive(permissionTimer) { _ in
-            guard !hasPermission else { return } // stop doing work once granted
-            hasPermission = AXIsProcessTrusted()
+        .onAppear {
+            // Only start polling if we don't have permission yet
+            if !hasPermission {
+                startPermissionPolling()
+            }
         }
+    }
+    
+    private func startPermissionPolling() {
+        // Poll every second until permission is granted
+        timerCancellable = Timer.publish(every: 1, on: .main, in: .common)
+            .autoconnect()
+            .sink { _ in
+                let currentPermission = AXIsProcessTrusted()
+                if currentPermission && !hasPermission {
+                    // Permission just granted - update state and cancel timer
+                    hasPermission = true
+                    timerCancellable?.cancel()
+                    timerCancellable = nil
+                } else if !hasPermission {
+                    // Still waiting for permission
+                    hasPermission = currentPermission
+                }
+            }
     }
 }

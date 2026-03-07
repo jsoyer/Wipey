@@ -47,9 +47,9 @@ public final class PreferencesManager {
 
         public var label: String {
             switch self {
-            case .sarcastic: return "Sarcastic"
-            case .zen:       return "Zen"
-            case .silent:    return "Silent"
+            case .sarcastic: return String(localized: "remarks_style.sarcastic", defaultValue: "Sarcastic", comment: "Remarks style label")
+            case .zen:       return String(localized: "remarks_style.zen", defaultValue: "Zen", comment: "Remarks style label")
+            case .silent:    return String(localized: "remarks_style.silent", defaultValue: "Silent", comment: "Remarks style label")
             }
         }
     }

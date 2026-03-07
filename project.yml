@@ -12,7 +12,7 @@ name: Wipey
 options:
   bundleIdPrefix: app.wipey
   deploymentTarget:
-    macOS: "13.0"
+    macOS: "14.0"
   xcodeVersion: "15.4"
   createIntermediateGroups: true
   defaultConfig: Debug
@@ -59,7 +59,7 @@ targets:
   Wipey:
     type: application
     platform: macOS
-    deploymentTarget: "13.0"
+    deploymentTarget: "14.0"
 
     # Source files — XcodeGen discovers all .swift files recursively
     sources:

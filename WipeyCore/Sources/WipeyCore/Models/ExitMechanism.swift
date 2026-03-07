@@ -12,21 +12,21 @@ public enum ExitMechanism: String, Codable, CaseIterable, Identifiable {
 
     public var title: String {
         switch self {
-        case .autoTimer:   return "Auto timer"
-        case .holdKey:     return "Hold key"
-        case .keySequence: return "Key sequence"
-        case .touchID:     return "Touch ID"
-        case .menuBar:     return "Menu bar button"
+        case .autoTimer:   return String(localized: "exit_mechanism.auto_timer.title", defaultValue: "Auto timer", comment: "Exit mechanism title")
+        case .holdKey:     return String(localized: "exit_mechanism.hold_key.title", defaultValue: "Hold key", comment: "Exit mechanism title")
+        case .keySequence: return String(localized: "exit_mechanism.key_sequence.title", defaultValue: "Key sequence", comment: "Exit mechanism title")
+        case .touchID:     return String(localized: "exit_mechanism.touch_id.title", defaultValue: "Touch ID", comment: "Exit mechanism title")
+        case .menuBar:     return String(localized: "exit_mechanism.menu_bar.title", defaultValue: "Menu bar button", comment: "Exit mechanism title")
         }
     }
 
     public var subtitle: String {
         switch self {
-        case .autoTimer:   return "Unlocks automatically after a set duration"
-        case .holdKey:     return "Hold Esc for a few seconds to unlock"
-        case .keySequence: return "Press Esc multiple times rapidly"
-        case .touchID:     return "Authenticate with Touch ID or password"
-        case .menuBar:     return "Always available — click the Wipey icon"
+        case .autoTimer:   return String(localized: "exit_mechanism.auto_timer.subtitle", defaultValue: "Unlocks automatically after a set duration", comment: "Exit mechanism subtitle")
+        case .holdKey:     return String(localized: "exit_mechanism.hold_key.subtitle", defaultValue: "Hold Esc for a few seconds to unlock", comment: "Exit mechanism subtitle")
+        case .keySequence: return String(localized: "exit_mechanism.key_sequence.subtitle", defaultValue: "Press Esc multiple times rapidly", comment: "Exit mechanism subtitle")
+        case .touchID:     return String(localized: "exit_mechanism.touch_id.subtitle", defaultValue: "Authenticate with Touch ID or password", comment: "Exit mechanism subtitle")
+        case .menuBar:     return String(localized: "exit_mechanism.menu_bar.subtitle", defaultValue: "Always available — click the Wipey icon", comment: "Exit mechanism subtitle")
         }
     }
 

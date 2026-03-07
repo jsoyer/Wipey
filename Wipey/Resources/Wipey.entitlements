@@ -1,22 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-    <!--
-        Direct distribution (non-sandboxed) + Hardened Runtime.
-        CGEventTap is incompatible with the App Store Sandbox — the App Store
-        target uses a separate SandboxInputBlocker with reduced blocking capability.
-    -->
-
-    <!-- Required for Sparkle to check wipey.app/appcast.xml for updates -->
-    <key>com.apple.security.network.client</key>
-    <true/>
-
-    <!--
-        No com.apple.security.app-sandbox — intentionally absent.
-        Sandboxing blocks CGEventTap at .cgSessionEventTap placement.
-        The App Store target (Wipey AppStore) has its own entitlements file
-        with com.apple.security.app-sandbox: true and a restricted InputBlocker.
-    -->
-</dict>
+<dict/>
 </plist>

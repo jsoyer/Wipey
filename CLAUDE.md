@@ -33,7 +33,7 @@ win CleanupBuddy users, go viral through mascot + UX quality.
 
 - **Language**: Swift 5.9+
 - **UI**: SwiftUI (shared across all platforms)
-- **Min target**: macOS 13.0 Ventura
+- **Min target**: macOS 14.0 Sonoma
 - **Localization**: `Localizable.xcstrings` (Xcode 15 format)
 - **Telemetry**: TelemetryDeck (opt-in only)
 - **Auto-update**: Sparkle 2 (direct distribution targets only)

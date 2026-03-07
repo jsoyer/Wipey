@@ -68,7 +68,7 @@ class iOSScreenDimmer: ScreenDimmer { /* UIView fullscreen black */ }
 
 | Platform | Minimum | Rationale |
 |---|---|---|
-| macOS | 13.0 Ventura | Reliable `CGEventTap`, mature SwiftUI |
+| macOS | 14.0 Sonoma | Required by `@Observable` (Observation framework) |
 | iOS | 17.0 | SwiftData, `Observable`, modern SwiftUI |
 | visionOS | 1.0 | First available SDK |
 

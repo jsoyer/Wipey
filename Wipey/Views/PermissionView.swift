@@ -13,11 +13,11 @@ struct PermissionView: View {
                 .symbolRenderingMode(.multicolor)
 
             VStack(spacing: 8) {
-                Text("permission.title", comment: "Title of the permission onboarding screen")
+                Text("Autorisation requise", comment: "Title of the permission onboarding screen")
                     .font(.title2)
                     .fontWeight(.semibold)
 
-                Text("permission.body", comment: "Explanation of why Accessibility permission is needed")
+                Text("Wipey a besoin de l'accès à l'accessibilité pour verrouiller votre clavier et trackpad pendant le nettoyage.", comment: "Explanation of why Accessibility permission is needed")
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -28,14 +28,14 @@ struct PermissionView: View {
                 Button {
                     openAccessibilitySettings()
                 } label: {
-                    Text("permission.cta", comment: "Button to open System Settings for Accessibility permission")
+                    Text("Ouvrir Réglages Système", comment: "Button to open System Settings for Accessibility permission")
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 4)
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
 
-                Text("permission.instructions", comment: "Step-by-step instructions after opening System Settings")
+                Text("Activez Wipey dans Confidentialité et sécurité › Accessibilité", comment: "Step-by-step instructions after opening System Settings")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
                     .multilineTextAlignment(.center)
