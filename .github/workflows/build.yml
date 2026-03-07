@@ -11,14 +11,11 @@ jobs:
   # ── WipeyCore unit tests (Swift Package — no xcodeproj needed) ─────────────
   test-core:
     name: WipeyCore Tests
-    runs-on: macos-14
+    runs-on: macos-15
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_15.4.app
 
       - name: Run WipeyCore tests
         working-directory: WipeyCore
@@ -27,14 +24,11 @@ jobs:
   # ── macOS app build (requires XcodeGen to produce the xcodeproj) ──────────
   build-macos:
     name: Build macOS app
-    runs-on: macos-14
+    runs-on: macos-15
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_15.4.app
 
       - name: Install XcodeGen
         run: brew install xcodegen
