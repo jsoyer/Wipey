@@ -43,10 +43,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         configureTelemetryDeck()
         applyMenuBarSettings()          // sets statusItem and activation policy
-        NSApp.activate(ignoringOtherApps: true)
         startObservingSession()
         startObservingPreferences()
         applyLaunchAtLogin(PreferencesManager.shared.launchAtLogin)
+
+        // Activate and configure window level after the initial layout pass is
+        // fully complete, avoiding the -layoutSubtreeIfNeeded recursion warning.
+        DispatchQueue.main.async {
+            NSApp.activate(ignoringOtherApps: false)
+            // Raise the main window above normal app windows so it stays visible
+            // while the user interacts with the desktop.
+            NSApp.windows.first(where: { !($0 is NSPanel) })?.level = .floating
+        }
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {

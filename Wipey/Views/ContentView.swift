@@ -26,8 +26,6 @@ struct ContentView: View {
         }
         .onAppear {
             remark = Remarks.idle(style: PreferencesManager.shared.remarksStyle)
-            // Set floating level only for main window
-            setMainWindowFloating()
         }
         .alert(
             Text("permission.alert.title", comment: "Alert title when accessibility is denied"),
@@ -188,18 +186,7 @@ struct ContentView: View {
         }
     }
     
-    private func setMainWindowFloating() {
-        // Find the main window (non-panel, contains ContentView)
-        DispatchQueue.main.async {
-            if let window = NSApp.windows.first(where: { 
-                !$0.title.contains("Settings") && 
-                $0.isVisible && 
-                !($0 is NSPanel) 
-            }) {
-                window.level = .floating
-            }
-        }
-    }
+
 }
 
 // MARK: - LockToggleRow
